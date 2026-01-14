@@ -11,7 +11,7 @@ end
 printstate()
 local logins = {
     { user = "fusion", password = "admin", hwid = "907414536" },
-    { user = "USER_REPLACE_THIS_SILKE",  password = "PASSWORD_KEEP_IT_RANDOM",  hwid = "" } -- REPLACE THE HWID WITH ANYTHING
+    { user = "USER_REPLACE_THIS",  password = "PASSWORD_KEEP_IT_RANDOM",  hwid = "replace_here" } -- hi silke, copy this down and replacee it with the valuese i told u
 }
 
 local function hardStop()
