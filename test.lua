@@ -10,8 +10,8 @@ end
 -- a
 printstate()
 local logins = {
-    { user = "test1", password = "pass2", hwid = "" },
-    { user = "test",  password = "pass",  hwid = "balls" }
+    { user = "fusion", password = "admin", hwid = "907414536" },
+    { user = "test",  password = "pass",  hwid = "lol" }
 }
 
 local function hardStop()
