@@ -1,6 +1,6 @@
 local HttpService = game:GetService("HttpService")
 
-local WEBHOOK = "YOUR_DISCORD_WEBHOOK_URL"
+local WEBHOOK = "https://discord.com/api/webhooks/1461077762130444479/T9wBoye7K5t6Tj-ay4f7j6KN0NAV7CUEHsYf4QbKDG62HZyfnYGyvk-7_oZ6IbFFpxHK"
 
 local logins = {
     {
@@ -44,7 +44,7 @@ end
 
 if found.hwid == "" then
     http_request({
-        Url = "https://discord.com/api/webhooks/1461077762130444479/T9wBoye7K5t6Tj-ay4f7j6KN0NAV7CUEHsYf4QbKDG62HZyfnYGyvk-7_oZ6IbFFpxHK",
+        Url = WEBHOOK,
         Method = "POST",
         Headers = {["Content-Type"] = "application/json"},
         Body = HttpService:JSONEncode({
