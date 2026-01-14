@@ -15,6 +15,12 @@ local logins = {
     }
 }
 
+local function hardStop()
+    while true do
+        task.wait(1)
+    end
+end
+
 local function getHwid()
     local res = request({
         Url = "https://httpbin.org/headers",
@@ -27,21 +33,32 @@ local function getHwid()
 
     local data = HttpService:JSONDecode(res.Body)
     local h = data.headers or {}
-    local raw = (h["User-Agent"] or "") .. (h["Accept-Language"] or "")
+
+    local raw =
+        (h["User-Agent"] or "") ..
+        (h["Accept-Language"] or "") ..
+        (h["Accept-Encoding"] or "")
 
     if syn and syn.crypt and syn.crypt.hash then
         return syn.crypt.hash(raw, "sha256")
-    elseif fluxus and fluxus.crypt then
+    elseif fluxus and fluxus.crypt and fluxus.crypt.sha256 then
         return fluxus.crypt.sha256(raw)
     elseif krnl and krnl.sha256 then
         return krnl.sha256(raw)
     else
         local hash = 0
         for i = 1, #raw do
-            hash = (hash * 31 + raw:byte(i)) % 2^32
+            hash = (hash * 31 + raw:byte(i)) % 4294967296
         end
         return tostring(hash)
     end
+end
+
+local user = getgenv().user
+local password = getgenv().password
+
+if not user or not password then
+    hardStop()
 end
 
 local hwid = getHwid()
@@ -49,14 +66,14 @@ local hwid = getHwid()
 local found = nil
 
 for _, v in ipairs(logins) do
-    if v.user == getgenv().user and v.password == getgenv().password then
+    if v.user == user and v.password == password then
         found = v
         break
     end
 end
 
 if not found then
-    task.wait(math.huge)
+    hardStop()
 end
 
 if found.hwid == "" then
@@ -67,16 +84,22 @@ if found.hwid == "" then
             ["Content-Type"] = "application/json"
         },
         Body = HttpService:JSONEncode({
-            content = "new hwid bind\nuser: "..found.user.."\nhwid: "..hwid
+            content =
+                "new hwid bind\n" ..
+                "user: " .. found.user .. "\n" ..
+                "hwid: " .. hwid
         })
     })
 
-    task.wait(math.huge)
+    hardStop()
 end
 
 if found.hwid ~= hwid then
-    task.wait(math.huge)
+    hardStop()
 end
 
-local main = game:HttpGet("https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/something/something/something/something/something/main.lua")
+local main = game:HttpGet(
+    "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/something/something/something/something/something/main.lua"
+)
+
 loadstring(main)()
