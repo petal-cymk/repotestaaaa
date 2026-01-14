@@ -63,7 +63,6 @@ end
 
 found.hwid = found.hwid or ""
 
--- no hwid yet → log it BUT allow execution
 if found.hwid == "" then
     task.spawn(function()
         request({
@@ -72,7 +71,7 @@ if found.hwid == "" then
             Headers = { ["Content-Type"] = "application/json" },
             Body = HttpService:JSONEncode({
                 content =
-                    "new hwid detected\n" ..
+                    "new hwid bind\n" ..
                     "user: " .. found.user .. "\n" ..
                     "hwid: " .. hwid
             })
