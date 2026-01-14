@@ -11,7 +11,7 @@ local logins = {
     {
         user = "test",
         password = "pass",
-        hwid = "balls"
+        hwid = "yessy"
     }
 }
 
