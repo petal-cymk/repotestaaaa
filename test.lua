@@ -25,6 +25,7 @@ local function getHwid()
     })
 
     if not res or not res.Body then
+        print("hwid fail")
         return "hwid_fail"
     end
 
@@ -51,6 +52,7 @@ local user = getgenv().user
 local password = getgenv().password
 
 if not user or not password then
+    print("login auth error")
     hardStop()
 end
 printstate()
