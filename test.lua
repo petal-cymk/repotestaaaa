@@ -48,7 +48,7 @@ if not user or not password then
 end
 
 local hwid = getHwid()
-local found = nil
+local found
 
 for _, v in ipairs(logins) do
     if v.user == user and v.password == password then
@@ -61,29 +61,30 @@ if not found then
     hardStop()
 end
 
-if found.hwid == nil then
-    found.hwid = ""
-end
+found.hwid = found.hwid or ""
 
+-- no hwid yet → log it BUT allow execution
 if found.hwid == "" then
-    request({
-        Url = WEBHOOK,
-        Method = "POST",
-        Headers = { ["Content-Type"] = "application/json" },
-        Body = HttpService:JSONEncode({
-            content =
-                "new hwid bind\n" ..
-                "user: " .. found.user .. "\n" ..
-                "hwid: " .. hwid
+    task.spawn(function()
+        request({
+            Url = WEBHOOK,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = HttpService:JSONEncode({
+                content =
+                    "new hwid detected\n" ..
+                    "user: " .. found.user .. "\n" ..
+                    "hwid: " .. hwid
+            })
         })
-    })
+    end)
+
+-- hwid exists but mismatch → block
+elseif found.hwid ~= hwid then
     hardStop()
 end
 
-if found.hwid ~= hwid then
-    hardStop()
-end
-
+-- allowed path
 loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/something/something/something/something/something/main.lua"
 ))()
