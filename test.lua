@@ -1,24 +1,14 @@
 local HttpService = game:GetService("HttpService")
 
 local WEBHOOK = "https://discord.com/api/webhooks/1461077762130444479/T9wBoye7K5t6Tj-ay4f7j6KN0NAV7CUEHsYf4QbKDG62HZyfnYGyvk-7_oZ6IbFFpxHK"
--- a
+
 local logins = {
-    {
-        user = "test1",
-        password = "pass2",
-        hwid = "907414536"
-    },
-    {
-        user = "test",
-        password = "pass",
-        hwid = "balls"
-    }
+    { user = "test1", password = "pass2", hwid = "" },
+    { user = "test",  password = "pass",  hwid = "balls" }
 }
 
 local function hardStop()
-    while true do
-        task.wait(1)
-    end
+    while true do task.wait(1) end
 end
 
 local function getHwid()
@@ -41,10 +31,6 @@ local function getHwid()
 
     if syn and syn.crypt and syn.crypt.hash then
         return syn.crypt.hash(raw, "sha256")
-    elseif fluxus and fluxus.crypt and fluxus.crypt.sha256 then
-        return fluxus.crypt.sha256(raw)
-    elseif krnl and krnl.sha256 then
-        return krnl.sha256(raw)
     else
         local hash = 0
         for i = 1, #raw do
@@ -62,7 +48,6 @@ if not user or not password then
 end
 
 local hwid = getHwid()
-
 local found = nil
 
 for _, v in ipairs(logins) do
@@ -84,9 +69,7 @@ if found.hwid == "" then
     request({
         Url = WEBHOOK,
         Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
+        Headers = { ["Content-Type"] = "application/json" },
         Body = HttpService:JSONEncode({
             content =
                 "new hwid bind\n" ..
@@ -94,7 +77,6 @@ if found.hwid == "" then
                 "hwid: " .. hwid
         })
     })
-
     hardStop()
 end
 
@@ -102,8 +84,6 @@ if found.hwid ~= hwid then
     hardStop()
 end
 
-local main = game:HttpGet(
+loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/something/something/something/something/something/main.lua"
-)
-
-loadstring(main)()
+))()
