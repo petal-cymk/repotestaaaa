@@ -75,7 +75,11 @@ end
 if not found then
     hardStop()
 end
---
+
+if found.hwid == nil then
+    found.hwid = ""
+end
+
 if found.hwid == "" then
     request({
         Url = WEBHOOK,
