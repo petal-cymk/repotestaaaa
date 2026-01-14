@@ -1,7 +1,7 @@
 local HttpService = game:GetService("HttpService")
 
 local WEBHOOK = "https://discord.com/api/webhooks/1461077762130444479/T9wBoye7K5t6Tj-ay4f7j6KN0NAV7CUEHsYf4QbKDG62HZyfnYGyvk-7_oZ6IbFFpxHK"
-
+-- a
 local logins = {
     { user = "test1", password = "pass2", hwid = "" },
     { user = "test",  password = "pass",  hwid = "balls" }
@@ -78,12 +78,10 @@ if found.hwid == "" then
         })
     end)
 
--- hwid exists but mismatch → block
 elseif found.hwid ~= hwid then
     hardStop()
 end
 
--- allowed path
 loadstring(game:HttpGet(
     "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/something/something/something/something/something/main.lua"
 ))()
