@@ -6,7 +6,7 @@ local logins = {
     {
         user = "test1",
         password = "pass2",
-        hwid = ""
+        hwid = "907414536"
     },
     {
         user = "test",
