@@ -4,8 +4,8 @@ local WEBHOOK = "YOUR_DISCORD_WEBHOOK_URL"
 
 local logins = {
     {
-        user = "whatever98473",
-        password = "ysryues485",
+        user = "test1",
+        password = "pass2",
         hwid = ""
     },
     {
