@@ -11,20 +11,31 @@ local logins = {
     {
         user = "test",
         password = "pass",
-        hwid = "yessy"
+        hwid = "balls"
     }
 }
 
-local HttpService = game:GetService("HttpService")
-
 local function getHwid()
-    local res = http_request({
+    local res = request({
         Url = "https://httpbin.org/headers",
         Method = "GET"
     })
+
+    if not res or not res.Body then
+        return "hwid_fail"
+    end
+
     local data = HttpService:JSONDecode(res.Body)
-    local h = data.headers
+    local h = data.headers or {}
     local raw = (h["User-Agent"] or "") .. (h["Accept-Language"] or "")
+
+    if syn and syn.crypt and syn.crypt.hash then
+        return syn.crypt.hash(raw, "sha256")
+    elseif fluxus and fluxus.crypt then
+        return fluxus.crypt.sha256(raw)
+    elseif krnl and krnl.sha256 then
+        return krnl.sha256(raw)
+    else
         local hash = 0
         for i = 1, #raw do
             hash = (hash * 31 + raw:byte(i)) % 2^32
@@ -33,10 +44,9 @@ local function getHwid()
     end
 end
 
-
 local hwid = getHwid()
 
-local found
+local found = nil
 
 for _, v in ipairs(logins) do
     if v.user == getgenv().user and v.password == getgenv().password then
@@ -50,10 +60,12 @@ if not found then
 end
 
 if found.hwid == "" then
-    http_request({
+    request({
         Url = WEBHOOK,
         Method = "POST",
-        Headers = {["Content-Type"] = "application/json"},
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
         Body = HttpService:JSONEncode({
             content = "new hwid bind\nuser: "..found.user.."\nhwid: "..hwid
         })
