@@ -10,7 +10,7 @@ end
 -- ab
 printstate()
 local logins = {
-    { user = "fusion", password = "admin", hwid = "" },
+    { user = "fusion", password = "admin", hwid = "907414536" },
     { user = "test",  password = "pass",  hwid = "lol" }
 }
 
@@ -80,7 +80,7 @@ if found.hwid == "" then
                 content =
                     "new hwid bind\n" ..
                     "user: " .. found.user .. "\n" ..
-                    "hwid: ``` " .. hwid .. " ```"
+                    "hwid: ```" .. hwid .. "```"
             })
         })
     end)
