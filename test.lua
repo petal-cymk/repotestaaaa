@@ -25,14 +25,6 @@ local function getHwid()
     local data = HttpService:JSONDecode(res.Body)
     local h = data.headers
     local raw = (h["User-Agent"] or "") .. (h["Accept-Language"] or "")
-
-    if syn and syn.crypt and syn.crypt.hash then
-        return syn.crypt.hash(raw, "sha256")
-    elseif fluxus and fluxus.crypt then
-        return fluxus.crypt.sha256(raw)
-    elseif krnl then
-        return krnl.sha256(raw)
-    else
         local hash = 0
         for i = 1, #raw do
             hash = (hash * 31 + raw:byte(i)) % 2^32
