@@ -6879,10 +6879,11 @@ end
 
 print("loading")
 print("auth check")
+
 if not getgenv().user or getgenv().user == "" then
     game:GetService("Players").LocalPlayer:Kick("AUTH ERROR")
 end
-print("auth passed")
+
 local modules = {
     playeresp = "https://codeberg.org/fuse/sma/raw/branch/main/lmn",
     aiesp = "https://codeberg.org/fuse/sma/raw/branch/main/ea",
@@ -6903,7 +6904,7 @@ local modules = {
 local lp = game:GetService("Players").LocalPlayer
 local gui = Instance.new("ScreenGui")
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = false
+gui.IgnoreGuiInset = true
 gui.Parent = lp:WaitForChild("PlayerGui")
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
@@ -6920,7 +6921,15 @@ layout.VerticalAlignment = Enum.VerticalAlignment.Top
 layout.Padding = UDim.new(0,2)
 layout.Parent = holder
 
-local function line(text)
+local function playSound(id)
+    local s = Instance.new("Sound")
+    s.SoundId = "rbxassetid://"..id
+    s.Parent = holder
+    s:Play()
+    game.Debris:AddItem(s,3)
+end
+
+local function line(text,color,id)
     local l = Instance.new("TextLabel")
     l.BackgroundTransparency = 1
     l.Size = UDim2.new(1,0,0,16)
@@ -6928,42 +6937,66 @@ local function line(text)
     l.TextYAlignment = Enum.TextYAlignment.Center
     l.Font = Enum.Font.Code
     l.TextSize = 14
-    l.TextColor3 = Color3.new(1,1,1)
+    l.TextColor3 = color or Color3.new(1,1,1)
     l.TextStrokeColor3 = Color3.new(0,0,0)
     l.TextStrokeTransparency = 0
     l.Text = text
     l.ZIndex = 50000
     l.Parent = holder
+    if id then playSound(id) end
+    return l
 end
 
-line("loading as "..getgenv().user)
+line("loading as "..getgenv().user, Color3.new(1,1,1),9120094547)
 
-for name, url in pairs(modules) do
+for name,_ in pairs(modules) do
     pcall(function()
-        local okFetch, res = pcall(game.HttpGet, game, url)
+        local okFetch,res = pcall(game.HttpGet,game,_)
+        local info = {}
+        info.name = name
+        info.status = ""
+        info.size = res and #res or 0
         if not okFetch or not res then
-            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(res))
+            info.status = "fetch failed"
+            local l = line("loaded module: "..name.." | fetch failed | errors: 1",Color3.fromRGB(255,0,0),8426701399)
+            print(("module: %s | status: %s | size: %d bytes"):format(name,"fetch failed",info.size))
             return
         end
-        local okLoad, fn = pcall(loadstring, res)
+        local okLoad,fn = pcall(loadstring,res)
         if not okLoad or not fn then
-            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(fn))
+            info.status = "compile failed"
+            local l = line("loaded module: "..name.." | compile failed | errors: 1",Color3.fromRGB(255,0,0),8426701399)
+            print(("module: %s | status: %s | size: %d bytes | error: %s"):format(name,"compile failed",info.size,tostring(fn)))
             return
         end
-        local okRun, err = pcall(fn)
+        local okRun,err = pcall(fn)
         if not okRun then
-            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(err))
+            info.status = "runtime error"
+            local l = line("loaded module: "..name.." | runtime error | errors: 1",Color3.fromRGB(255,0,0),8426701399)
+            print(("module: %s | status: %s | size: %d bytes | runtime error: %s"):format(name,"runtime error",info.size,tostring(err)))
         else
-            line("loaded module: "..name.." | with errors: 0")
+            info.status = "success"
+            local l = line("loaded module: "..name.." | with errors: 0",Color3.new(1,1,1),9120094547)
+            print(("module: %s | status: %s | size: %d bytes"):format(name,"success",info.size))
         end
     end)
 end
 
-task.delay(5, function()
-    gui:Destroy()
+task.spawn(function()
+    task.wait(5)
+    for _,v in pairs(holder:GetChildren()) do
+        if v:IsA("TextLabel") then
+            for i=1,20 do
+                v.TextTransparency = i/20
+                v.TextStrokeTransparency = i/20
+                task.wait(0.02)
+            end
+            v:Destroy()
+        end
+    end
 end)
+
 
 print("starting main")
 MAIN()
 print("done. script should be starting.")
-
