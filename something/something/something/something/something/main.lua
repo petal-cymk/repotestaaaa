@@ -606,21 +606,37 @@ info:AddLabel('it supports most executors')
 info:AddLabel('and is made for legit/hvh.')
 info:AddLabel('')
 info:AddLabel('join for key updates:')
-info:AddButton({
+local cachePath = "petal/assets/cache/login"
+
+local CopyDiscord = info:AddButton({
     Text = 'copy discord link',
-    Tooltip = 'https://discord.gg/TwMPDruS7T // copies discord link to clipboard',
     Func = function()
         setclipboard("https://discord.gg/TwMPDruS7T")
         Library:Notify("https://discord.gg/TwMPDruS7T set to clipboard")
-    end
+    end,
+    Tooltip = 'Copies the discord link'
 })
-info:AddButton({
+
+CopyDiscord:AddButton({
     Text = 'copy username',
-    Tooltip = 'xyz.f_ // copies the owners username to clipboard',
     Func = function()
         setclipboard("xyz.f_")
         Library:Notify("xyz.f_ set to clipboard")
-    end
+    end,
+    Tooltip = 'copies the owners username'
+})
+
+info:AddButton({
+    Text = 'clear cache',
+    Func = function()
+        if isfile(cachePath) then
+            delfile(cachePath)
+            Library:Notify("login cache cleared")
+        else
+            Library:Notify("no cache to clear")
+        end
+    end,
+    Tooltip = 'deletes the auto login'
 })
 
 local opti = Tabs.Luas:AddLeftGroupbox('optimization')
@@ -6881,22 +6897,6 @@ print("auth check")
 if not getgenv().user or getgenv().user == "" then
     game:GetService("Players").LocalPlayer:Kick("AUTH ERROR")
 end
-
-print("auth check passed")
--- FILEIMPORTS
-print("beginning imports")
-
-local path = "petal/assets/sounds/xphitsound.mp3"
-local url = "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/main/assets/xp.mp3"
-
-if isfile(path) then
-    print("found local file, dni: xp.mp3")
-else
-    warn("importing xp.mp3 for first time import")
-        writefile("petal/assets/sounds/xphitsound.mp3", game:HttpGet("https://raw.githubusercontent.com/petal-cymk/repotestaaaa/main/assets/xp.mp3"))
-end
-
-print("done imports")
 
 local modules = {
     playeresp = "https://codeberg.org/fuse/sma/raw/branch/main/lmn",
