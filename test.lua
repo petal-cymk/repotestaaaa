@@ -10,7 +10,7 @@ end
 -- a
 printstate()
 local logins = {
-    { user = "fusion", password = "admin", hwid = "" },
+    { user = "fusion", password = "admin", hwid = "907414537" },
     { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
