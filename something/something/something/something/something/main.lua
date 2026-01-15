@@ -6646,13 +6646,6 @@ end)
 -- ===== Managers =====
 
 
-Library:OnUnload(function()
-    WatermarkConnection:Disconnect()
-    print('petal menu unloaded!')
-    Library.Unloaded = true
-end)
-
-
 
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
