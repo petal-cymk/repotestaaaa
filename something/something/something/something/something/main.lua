@@ -10,11 +10,6 @@ if getgenv().executed then
 end
 print("double execution check passed")
 print("identify executor/setup getgenvs")
-
-
-getgenv().Version = "v26.1.3.1" or "unspecified ver"
-
-
 local name
 pcall(function()
 	name = identifyexecutor()
@@ -36,7 +31,7 @@ ThemeManager = loadstring(game:HttpGet(repo .. 'addons/ThemeManager.lua'))()
 SaveManager = loadstring(game:HttpGet(repo .. 'addons/SaveManager.lua'))()
 
 Window = Library:CreateWindow({
-    Title = 'petal.lua | ' .. getgenv().build .. ' | ' .. getgenv().Version ..'| ' .. getgenv().injectorActive,
+    Title = 'petal.lua | ' .. getgenv().build .. ' | ' .. getgenv().injectorActive,
     Center = true,
     AutoShow = true,
     TabPadding = 2,
@@ -6880,6 +6875,93 @@ Movement()
 Cam()
 end
 
+print("loading")
+print("auth check")
+if not getgenv().user or getgenv().user == "" then
+    game:GetService("Players").LocalPlayer:Kick("AUTH ERROR")
+end
+print("auth passed")
+local modules = {
+    playeresp = "https://codeberg.org/fuse/sma/raw/branch/main/lmn",
+    aiesp = "https://codeberg.org/fuse/sma/raw/branch/main/ea",
+    aichams = "https://pastebin.com/raw/Vgx7G7S4",
+    playeraimbot = "https://pastebin.com/raw/VE0HwMZW",
+    playerchams = "https://pastebin.com/raw/Hqgzpb1n",
+    vmeditor = "https://pastebin.com/raw/hGB7WVax",
+    norecoil = "https://pastebin.com/raw/Vqd8wkP6",
+    bhop = "https://pastebin.com/raw/vsgdNSSH",
+    grenadeesp = "https://pastebin.com/raw/E5NpSz4h",
+    landminedelete = "https://pastebin.com/raw/1X2HWraU",
+    mineEsp = "https://pastebin.com/raw/GJem6ti2",
+    silentaim = "https://codeberg.org/fuse/sma/raw/branch/main/sl",
+    corpseesp = "https://pastebin.com/raw/g0T31sYd",
+    invchecker = "https://pastebin.com/raw/VBc0Gx4G",
+}
+
+local lp = game:GetService("Players").LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.Parent = lp:WaitForChild("PlayerGui")
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+local holder = Instance.new("Frame")
+holder.BackgroundTransparency = 1
+holder.Size = UDim2.fromScale(1,1)
+holder.Position = UDim2.new(0,6,0,6)
+holder.ZIndex = 50000
+holder.Parent = gui
+
+local layout = Instance.new("UIListLayout")
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+layout.VerticalAlignment = Enum.VerticalAlignment.Top
+layout.Padding = UDim.new(0,2)
+layout.Parent = holder
+
+local function line(text)
+    local l = Instance.new("TextLabel")
+    l.BackgroundTransparency = 1
+    l.Size = UDim2.new(1,0,0,16)
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.TextYAlignment = Enum.TextYAlignment.Center
+    l.Font = Enum.Font.Code
+    l.TextSize = 14
+    l.TextColor3 = Color3.new(1,1,1)
+    l.TextStrokeColor3 = Color3.new(0,0,0)
+    l.TextStrokeTransparency = 0
+    l.Text = text
+    l.ZIndex = 50000
+    l.Parent = holder
+end
+
+line("loading as "..getgenv().user)
+
+for name, url in pairs(modules) do
+    pcall(function()
+        local okFetch, res = pcall(game.HttpGet, game, url)
+        if not okFetch or not res then
+            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(res))
+            return
+        end
+        local okLoad, fn = pcall(loadstring, res)
+        if not okLoad or not fn then
+            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(fn))
+            return
+        end
+        local okRun, err = pcall(fn)
+        if not okRun then
+            line("loaded module: "..name.." | with errors: 1 | error specified: "..tostring(err))
+        else
+            line("loaded module: "..name.." | with errors: 0")
+        end
+    end)
+end
+
+task.delay(5, function()
+    gui:Destroy()
+end)
+
 print("starting main")
 MAIN()
 print("done. script should be starting.")
+
