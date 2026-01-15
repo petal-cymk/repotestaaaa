@@ -3586,10 +3586,13 @@ Env:AddToggle('NoGrass', {
 
         if t:FindFirstChild("Decoration") ~= nil then
             t.Decoration = not v
-        elseif rawget(t, "Decoration") ~= nil then
-            t.Decoration = not v
         else
-            sethiddenproperty(t, "Decoration", not v)
+            local ok, val = pcall(rawget, t, "Decoration")
+            if ok and val ~= nil then
+                t.Decoration = not v
+            else
+                sethiddenproperty(t, "Decoration", not v)
+            end
         end
     end
 })
