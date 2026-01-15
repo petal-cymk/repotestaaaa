@@ -6886,7 +6886,7 @@ print("auth check passed")
 -- FILEIMPORTS
 print("beginning imports")
 
-if isfile(path) then
+if isfile("petal/assets/sounds/xphitsound.mp3") then
     print("found local file, dni: xp.mp3")
 else
     warn("importing xp.mp3 for first time import")
