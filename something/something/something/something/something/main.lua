@@ -6608,17 +6608,16 @@ local FrameTimer = tick()
 local FrameCounter = 0
 local FPS = 60
 
-local WatermarkConnection = game:GetService('RunService').RenderStepped:Connect(function()
+game:GetService('RunService').RenderStepped:Connect(function()
     FrameCounter += 1
     if tick() - FrameTimer >= 1 then
         FPS = FrameCounter
         FrameTimer = tick()
         FrameCounter = 0
     end
-    Library:SetWatermark(('petal.lua | %s fps | %s ms | %s | %s'):format(
+    Library:SetWatermark(('petal.lua | %s fps | %s ms | %s'):format(
         math.floor(FPS),
         math.floor(game:GetService('Stats').Network.ServerStatsItem['Data Ping']:GetValue()),
-        getgenv().Version .. ' ' .. (getgenv().build or 'unspecified build'),
         getgenv().injectorActive or 'unknown executor'
     ))
 end)
