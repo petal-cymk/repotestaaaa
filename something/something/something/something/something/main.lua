@@ -6900,7 +6900,7 @@ local modules = {
 local lp = game:GetService("Players").LocalPlayer
 local gui = Instance.new("ScreenGui")
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true
+gui.IgnoreGuiInset = false
 gui.Parent = lp:WaitForChild("PlayerGui")
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
