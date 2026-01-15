@@ -609,7 +609,7 @@ info:AddLabel('join for key updates:')
 local cachePath = "petal/assets/cache/login"
 
 local CopyDiscord = info:AddButton({
-    Text = 'copy discord link',
+    Text = 'discord link',
     Func = function()
         setclipboard("https://discord.gg/TwMPDruS7T")
         Library:Notify("https://discord.gg/TwMPDruS7T set to clipboard")
@@ -618,7 +618,7 @@ local CopyDiscord = info:AddButton({
 })
 
 CopyDiscord:AddButton({
-    Text = 'copy username',
+    Text = 'username',
     Func = function()
         setclipboard("xyz.f_")
         Library:Notify("xyz.f_ set to clipboard")
