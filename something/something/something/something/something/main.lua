@@ -6882,6 +6882,19 @@ if not getgenv().user or getgenv().user == "" then
     game:GetService("Players").LocalPlayer:Kick("AUTH ERROR")
 end
 
+print("auth check passed")
+-- FILEIMPORTS
+print("beginning imports")
+
+if isfile(path) then
+    print("found local file, dni: xp.mp3")
+else
+    warn("importing xp.mp3 for first time import")
+    writefile("petal/assets/sounds/xphitsound.mp3", game:HttpGet("https://raw.githubusercontent.com/petal-cymk/repotestaaaa/main/assets/xp.mp3"))
+end
+
+print("done imports")
+
 local modules = {
     playeresp = "https://codeberg.org/fuse/sma/raw/branch/main/lmn",
     aiesp = "https://codeberg.org/fuse/sma/raw/branch/main/ea",
