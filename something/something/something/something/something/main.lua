@@ -606,7 +606,7 @@ info:AddLabel('it supports most executors')
 info:AddLabel('and is made for legit/hvh.')
 info:AddLabel('')
 info:AddLabel('join for key updates:')
-local cachePath = "petal/assets/cache/login"
+
 
 local CopyDiscord = info:AddButton({
     Text = 'discord link',
@@ -626,8 +626,11 @@ CopyDiscord:AddButton({
     Tooltip = 'copies the owners username'
 })
 
-info:AddButton({
-    Text = 'clear cache',
+
+info:AddLabel('cache clearing')
+local cachePath = "petal/assets/cache/login"
+local login = info:AddButton({
+    Text = 'login',
     Func = function()
         if isfile(cachePath) then
             delfile(cachePath)
@@ -638,6 +641,49 @@ info:AddButton({
     end,
     Tooltip = 'deletes the auto login'
 })
+
+local assetPath = "petal/assets"
+login:AddButton({
+    Text = 'cache',
+    Func = function()
+        if isfolder(assetPath) then
+            delfolder(assetPath)
+            Library:Notify("cleared cache successfully")
+        else
+            Library:Notify("no cache to clear")
+        end
+    end,
+    Tooltip = 'deletes the whole asset folder, containing sfx/login caches'
+})
+
+local themePath = "petal/themes"
+local themes = info:AddButton({
+    Text = 'themes',
+    Func = function()
+        if isfolder(themePath) then
+            delfolder(themePath)
+            Library:Notify("themes deleted")
+        else
+            Library:Notify("no themes to clear")
+        end
+    end,
+    Tooltip = 'deletes the themes you saved.'
+})
+
+local cfgPath = "petal/ProjectDelta/settings"
+themes:AddButton({
+    Text = 'configs',
+    Func = function()
+        if isfolder(cfgPath) then
+            delfolder(cfgPath)
+            Library:Notify("cfgs deleted")
+        else
+            Library:Notify("no cfgs to clear")
+        end
+    end,
+    Tooltip = 'deletes all your configs.'
+})
+
 
 local opti = Tabs.Luas:AddLeftGroupbox('optimization')
 
