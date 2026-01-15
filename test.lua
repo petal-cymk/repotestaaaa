@@ -1,17 +1,16 @@
 local HttpService = game:GetService("HttpService")
 
-local WEBHOOK = "https://discord.com/api/webhooks/1461077762130444479/T9wBoye7K5t6Tj-ay4f7j6KN0NAV7CUEHsYf4QbKDG62HZyfnYGyvk-7_oZ6IbFFpxHK"
+local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GKzEdvU23qn5GM0wilHwxh8i45ngp_BdHzosvFvL5WHDF2xvEcfT659vp5gQ"
 
 local printstatus = 0
 local function printstate()
     print(printstatus)
     printstatus = printstatus + 1
 end
--- ab
+-- a
 printstate()
 local logins = {
     { user = "fusion", password = "admin", hwid = "907414536" },
-    { user = "USER_REPLACE_THIS",  password = "PASSWORD_KEEP_IT_RANDOM",  hwid = "replace_here" }, -- hi silke, copy this down and replacee it with the valuese i told u. MAKE SURE HWID IS EMPTY
     { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
@@ -26,7 +25,6 @@ local function getHwid()
     })
 
     if not res or not res.Body then
-        print("hwid fail")
         return "hwid_fail"
     end
 
@@ -53,7 +51,6 @@ local user = getgenv().user
 local password = getgenv().password
 
 if not user or not password then
-    print("login auth error")
     hardStop()
 end
 printstate()
@@ -83,7 +80,7 @@ if found.hwid == "" then
                 content =
                     "new hwid bind\n" ..
                     "user: " .. found.user .. "\n" ..
-                    "hwid: ```" .. hwid .. "```"
+                    "hwid: ```" .. hwid .. "```" 
             })
         })
     end)
