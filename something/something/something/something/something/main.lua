@@ -1,5 +1,10 @@
--- hi, if you cracked this jst know this script has ZERO effort. it is unoptimized and crappy so go crack something thats worth your time
-print("you passed verification. good job if you cracked it ig but its free gng go get something worth your time 🥀")
+--[[ hi,
+if you:
+a. found this out of nowhere, go away
+b. found this on purpose and know what you just found, well hi
+c. cracked this jst know this script has ZERO effort. it is unoptimized and crappy so go crack something thats worth your time
+]]--
+print("you passed verification")
 print("waiting until game is loaded")
 repeat task.wait() until game:IsLoaded()
 print("game loaded (according to rbx)")
@@ -6904,7 +6909,7 @@ local modules = {
 local lp = game:GetService("Players").LocalPlayer
 local gui = Instance.new("ScreenGui")
 gui.ResetOnSpawn = false
-gui.IgnoreGuiInset = true
+gui.IgnoreGuiInset = false
 gui.Parent = lp:WaitForChild("PlayerGui")
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 
