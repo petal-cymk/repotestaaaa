@@ -1025,8 +1025,6 @@ end)
 
 
 
-
-
 -- no more skel logic
 
 VisualPlayerGroup:AddToggle('ESPHPTextToggle', {
@@ -1053,6 +1051,17 @@ VisualPlayerGroup:AddToggle('ESPBoxToggle', {
         getgenv().PlayerESP_Box = value
     end
 })
+VisualPlayerGroup:AddToggle('ESPGlowToggle', {
+    Text = 'box glow',
+    Tooltip = 'adds glow to the box',
+    Default = getgenv().BoxGlowActive or false,
+    Callback = function(value)
+        getgenv().BoxGlowActive = value
+    end
+})
+
+
+
 VisualPlayerGroup:AddToggle('ESPDistToggle', {
     Text = 'distance',
     Tooltip = 'shows distance under the box w drawing API)',
@@ -1253,7 +1262,7 @@ Toggles.GlowChamsToggle:OnChanged(function()
 end)
 
 VisualPlayerGroup:AddSlider('GlowChamsIntensity', {
-    Text = 'glow intensity',
+    Text = 'glowcham intensity',
     Default = getgenv().PlayerESP_GlowIntensity,
     Min = 0,
     Max = 1,
@@ -1282,6 +1291,82 @@ task.spawn(function()
         end
     end
 end)
+
+
+
+VisualPlayerGroup:AddSlider("GlowBoxSize", {
+	Text = "box glow intensity",
+	Min = 0,
+	Max = 1,
+	Default = getgenv().BoxGlowIntensity or 1,
+	Rounding = 3,
+	Callback = function(v)
+		getgenv().BoxGlowIntensity = v
+	end
+})
+
+local gradlabel = VisualPlayerGroup:AddLabel('box glow color'):AddColorPicker('BoxGlowColor1', {
+    Default = getgenv().BoxGlowColor1,
+    Title = 'gradient color 1',
+    Callback = function(c) getgenv().BoxGlowColor1 = c end
+})
+
+gradlabel:AddColorPicker('BoxGlowColor2', {
+    Default = getgenv().BoxGlowColor2,
+    Title = 'gradient color 2',
+    Callback = function(c) getgenv().BoxGlowColor2 = c end
+})
+
+VisualPlayerGroup:AddSlider("GlowBoxRotation", {
+	Text = "box glow gradient rotation",
+	Min = 0,
+	Max = 360,
+	Default = getgenv().GradientRotationBoxGlow or 0,
+	Rounding = 1,
+	Callback = function(v)
+		getgenv().GradientRotationBoxGlow = v
+	end
+})
+
+VisualPlayerGroup:AddToggle("GlowBoxSpin", {
+	Text = "animate gradient",
+	Default = false,
+	Callback = function(val)
+		getgenv().GlowBoxSpin = val
+	end
+})
+
+VisualPlayerGroup:AddDropdown("GlowBoxSpinMode", {
+	Text = "animation style",
+	Values = {"loop", "rebound"},
+	Default = getgenv().GlowBoxSpinMode or "loop",
+	Callback = function(val)
+		getgenv().GlowBoxSpinMode = val
+	end
+})
+
+VisualPlayerGroup:AddDropdown("GlowBoxSpinStyle", {
+	Text = "animate easing",
+	Values = {"linear", "ease-in", "ease-out", "ease-in-out"},
+	Default = getgenv().GlowBoxSpinStyle or "linear",
+	Callback = function(val)
+		getgenv().GlowBoxSpinStyle = val
+	end
+})
+
+VisualPlayerGroup:AddSlider("GlowBoxSpinSpeed", {
+    Text = "animate speed",
+    Min = 0.01,
+    Max = 1,
+    Default = getgenv().GlowBoxSpinSpeed or 0.1,
+    Rounding = 2,
+    Callback = function(v)
+        getgenv().GlowBoxSpinSpeed = v
+    end
+})
+
+
+
 
 
 local Players = game:GetService("Players")
