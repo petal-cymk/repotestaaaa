@@ -11,7 +11,7 @@ end
 printstate()
 local logins = {
     { user = "fusion", password = "admin", hwid = "907414537" },
-    { user = "silke",  password = "Imafemboy",  hwid = "" },
+    { user = "silke",  password = "Imafemboy",  hwid = "nil" },
 }
 
 local function hardStop()
