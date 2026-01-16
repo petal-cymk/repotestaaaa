@@ -7,11 +7,11 @@ local function printstate()
     print(printstatus)
     printstatus = printstatus + 1
 end
--- a
+-- ab
 printstate()
 local logins = {
     { user = "fusion", password = "admin", hwid = "907414537" },
-    { user = "silke_welt",  password = "Imafemboi",  hwid = "" },
+    { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
 local function hardStop()
