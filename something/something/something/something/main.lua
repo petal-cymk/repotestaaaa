@@ -516,6 +516,200 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local parts = {
+    "Head",
+    "UpperTorso","LowerTorso",
+    "LeftUpperArm","LeftLowerArm","LeftHand",
+    "RightUpperArm","RightLowerArm","RightHand",
+    "LeftUpperLeg","LeftLowerLeg","LeftFoot",
+    "RightUpperLeg","RightLowerLeg","RightFoot"
+}
+
+local adornments = {}
+local chamColor = Color3.fromRGB(255,0,0)
+local chamTransparency = 0.5
+
+local function clearChams()
+    for _, v in pairs(adornments) do
+        v:Destroy()
+    end
+    table.clear(adornments)
+end
+
+local function applyChams(char)
+    for _, name in ipairs(parts) do
+        local part = char:FindFirstChild(name)
+        if part and part:IsA("BasePart") then
+            local box = Instance.new("BoxHandleAdornment")
+            box.Adornee = part
+            box.AlwaysOnTop = true
+            box.ZIndex = 10
+            box.Size = part.Size
+            box.Color3 = chamColor
+            box.Transparency = chamTransparency
+            box.Parent = part
+            table.insert(adornments, box)
+        end
+    end
+end
+
+local function refreshChams()
+    clearChams()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= lp and plr.Character then
+            applyChams(plr.Character)
+        end
+    end
+end
+
+local chamGroup = tabs.wallhacks:AddRightGroupbox("Chams")
+
+local chamtoggle = chamGroup:AddToggle("ChamsEnabled", {
+    Text = "player chams",
+    Default = false
+})
+
+chamtoggle:AddColorPicker("ChamColor", {
+    Title = "color",
+    Default = chamColor,
+    Transparency = chamTransparency
+})
+
+Toggles.ChamsEnabled:OnChanged(function(v)
+    if v then
+        refreshChams()
+    else
+        clearChams()
+    end
+end)
+
+Options.ChamColor:OnChanged(function()
+    chamColor = Options.ChamColor.Value
+    chamTransparency = Options.ChamColor.Transparency
+    if Toggles.ChamsEnabled.Value then
+        refreshChams()
+    end
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(function()
+        if Toggles.ChamsEnabled.Value then
+            task.wait(0.5)
+            refreshChams()
+        end
+    end)
+end)
+
+
+local Players = game:GetService("Players")
+local lp = Players.LocalPlayer
+
+local stored = {}
+local chamColor = Color3.fromRGB(255, 0, 0)
+local chamTransparency = 0
+
+local function store(inst, prop, val)
+    stored[inst] = stored[inst] or {}
+    if stored[inst][prop] == nil then
+        stored[inst][prop] = val
+    end
+end
+
+local function applyBodyCham(char)
+    for _, d in ipairs(char:GetDescendants()) do
+        if d:IsA("BasePart") then
+            store(d, "Material", d.Material)
+            store(d, "Color", d.Color)
+            store(d, "Transparency", d.Transparency)
+
+            d.Material = Enum.Material.Neon
+            d.Color = chamColor
+            d.Transparency = chamTransparency
+
+        elseif d:IsA("Decal") or d:IsA("Texture") or d:IsA("SurfaceAppearance") then
+            store(d, "Parent", d.Parent)
+            d.Parent = nil
+        end
+    end
+
+    -- shirt + pants (direct children)
+    local shirt = char:FindFirstChildOfClass("Shirt")
+    if shirt then
+        store(shirt, "Parent", shirt.Parent)
+        shirt.Parent = nil
+    end
+
+    local pants = char:FindFirstChildOfClass("Pants")
+    if pants then
+        store(pants, "Parent", pants.Parent)
+        pants.Parent = nil
+    end
+end
+
+local function restoreBodyCham()
+    for inst, props in pairs(stored) do
+        pcall(function()
+            if props.Parent then
+                inst.Parent = props.Parent
+            end
+            for prop, val in pairs(props) do
+                if prop ~= "Parent" then
+                    inst[prop] = val
+                end
+            end
+        end)
+    end
+    table.clear(stored)
+end
+
+local function refresh()
+    restoreBodyCham()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= lp and plr.Character then
+            applyBodyCham(plr.Character)
+        end
+    end
+end
+
+local bchamst = chamsGroup:AddToggle("BodyChams", {
+    Text = "vischams",
+    Default = false
+})
+
+bchamst:AddColorPicker("BodyChamColor", {
+    Title = "color",
+    Default = chamColor,
+    Transparency = chamTransparency
+})
+
+Toggles.BodyChams:OnChanged(function(v)
+    if v then
+        refresh()
+    else
+        restoreBodyCham()
+    end
+end)
+
+Options.BodyChamColor:OnChanged(function()
+    chamColor = Options.BodyChamColor.Value
+    chamTransparency = Options.BodyChamColor.Transparency
+    if Toggles.BodyChams.Value then
+        refresh()
+    end
+end)
+
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(function()
+        if Toggles.BodyChams.Value then
+            task.wait(0.5)
+            refresh()
+        end
+    end)
+end)
+
 
 
 local mainGroup = tabs.wallhacks:AddLeftGroupbox('players esp')
