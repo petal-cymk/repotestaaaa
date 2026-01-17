@@ -3802,7 +3802,7 @@ Env = Tabs.Misc:AddRightGroupbox('World')
 local Lighting = game:GetService("Lighting")
 local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
 
-Env:AddToggle('EnvMaster', { Text = 'environmnet editor', Default = false })
+Env:AddToggle('EnvMaster', { Text = 'environment editor', Default = false })
 
 Env:AddDivider()
 
