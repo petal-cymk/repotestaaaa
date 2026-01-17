@@ -2725,18 +2725,69 @@ silgroup:AddToggle("TargetTracer", {
 local silgroup = Tabs.Combat:AddRightGroupbox('Advanced silent')
 -- yes im redefining it idgaf
 
+local glowPath = "petal/assets/images/fovglow.png"
+local glowUrl = "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/main/assets/fovglow.png"
+
+if not isfile(glowPath) then
+    warn("importing fovglow.png for first time import")
+    writefile(glowPath, game:HttpGet(glowUrl))
+else
+    print("local fovglow found")
+end
+
+local glowAsset = getcustomasset(glowPath)
+
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+
+local GlowGui = Instance.new("ScreenGui")
+GlowGui.Name = "FovGlowGui"
+GlowGui.ResetOnSpawn = false
+GlowGui.Parent = lp:WaitForChild("PlayerGui")
+
+local Glow = Instance.new("ImageLabel")
+Glow.AnchorPoint = Vector2.new(0.5, 0.5)
+Glow.BackgroundTransparency = 1
+Glow.Image = glowAsset
+Glow.ImageTransparency = 0
+Glow.Visible = false
+Glow.Parent = GlowGui
+
+local Gradient = Instance.new("UIGradient")
+Gradient.Parent = Glow
+
+getgenv().FovGlow = getgenv().FovGlow ~= false
+getgenv().GlowUse3 = getgenv().GlowUse3 ~= false
+getgenv().GlowSpin = false
+getgenv().GlowRotation = 0
+getgenv().GlowSpinSpeed = 30
+
+getgenv().GlowC1 = getgenv().GlowC1 or Color3.fromRGB(255,255,255)
+getgenv().GlowC2 = getgenv().GlowC2 or Color3.fromRGB(255,150,200)
+getgenv().GlowC3 = getgenv().GlowC3 or Color3.fromRGB(255,255,255)
+
+getgenv().GlowT1 = getgenv().GlowT1 or 0
+getgenv().GlowT2 = getgenv().GlowT2 or 0.3
+getgenv().GlowT3 = getgenv().GlowT3 or 1
+
 
 silgroup:AddDropdown('HitPart', {
     Values = { 'Head', 'HumanoidRootPart' },
     Default = getgenv().HitPart or 'Head',
     Text = 'hit part',
-    Callback = function(value) getgenv().HitPart = value end
+    Callback = function(v)
+        getgenv().HitPart = v
+    end
 })
 
-silgroup:AddToggle('FovVisible', {
+local showfov = silgroup:AddToggle('FovVisible', {
     Text = 'show fov',
     Default = getgenv().FovVisible ~= false,
-    Callback = function(v) getgenv().FovVisible = v end
+    Callback = function(v)
+        getgenv().FovVisible = v
+    end
 })
 
 silgroup:AddSlider('FovRadius', {
@@ -2745,7 +2796,133 @@ silgroup:AddSlider('FovRadius', {
     Min = 50,
     Max = 1000,
     Rounding = 0,
-    Callback = function(v) getgenv().FovRadius = v end
+    Callback = function(v)
+        getgenv().FovRadius = v
+    end
+})
+
+silgroup:AddSlider('FovThickness', {
+    Text = 'fov thickness',
+    Default = getgenv().FovThickness or 1,
+    Min = 1,
+    Max = 10,
+    Rounding = 1,
+    Callback = function(v)
+        getgenv().FovThickness = v
+    end
+})
+
+local fovoutline = silgroup:AddToggle('FovOutline', {
+    Text = 'fov outline',
+    Default = getgenv().FovOutline ~= false,
+    Callback = function(v)
+        getgenv().FovOutline = v
+    end
+})
+
+showfov:AddColorPicker('FovColor', {
+    Default = getgenv().FovColor or Color3.fromRGB(255,255,255),
+    Callback = function(v)
+        getgenv().FovColor = v
+    end
+})
+
+fovoutline:AddColorPicker('FovOutlineColor', {
+    Default = getgenv().FovOutlineColor or Color3.fromRGB(0,0,0),
+    Callback = function(v)
+        getgenv().FovOutlineColor = v
+    end
+})
+
+silgroup:AddSlider('FovOutlineThickness', {
+    Text = 'outline thickness',
+    Default = getgenv().FovOutlineThickness or 1,
+    Min = 1,
+    Max = 6,
+    Rounding = 1,
+    Callback = function(v)
+        getgenv().FovOutlineThickness = v
+    end
+})
+
+silgroup:AddToggle("FovGlow", {
+    Text = "fov glow",
+    Default = getgenv().FovGlow,
+    Callback = function(v)
+        getgenv().FovGlow = v
+    end
+})
+
+local gradsillabel = silgroup:AddLabel("glow color")
+
+gradsillabel:AddColorPicker("GlowC1", {
+    Default = getgenv().GlowC1,
+    Callback = function(v) getgenv().GlowC1 = v end
+})
+
+gradsillabel:AddColorPicker("GlowC2", {
+    Default = getgenv().GlowC2,
+    Callback = function(v) getgenv().GlowC2 = v end
+})
+
+gradsillabel:AddColorPicker("GlowC3", {
+    Default = getgenv().GlowC3,
+    Callback = function(v) getgenv().GlowC3 = v end
+})
+
+silgroup:AddSlider("GlowT1", {
+    Text = "glow alpha 1",
+    Min = 0, Max = 1, Rounding = 2,
+    Default = getgenv().GlowT1,
+    Callback = function(v) getgenv().GlowT1 = v end
+})
+
+silgroup:AddSlider("GlowT2", {
+    Text = "glow alpha 2",
+    Min = 0, Max = 1, Rounding = 2,
+    Default = getgenv().GlowT2,
+    Callback = function(v) getgenv().GlowT2 = v end
+})
+
+silgroup:AddSlider("GlowT3", {
+    Text = "glow alpha 3",
+    Min = 0, Max = 1, Rounding = 2,
+    Default = getgenv().GlowT3,
+    Callback = function(v) getgenv().GlowT3 = v end
+})
+
+silgroup:AddToggle("GlowUse3", {
+    Text = "3 point gradient",
+    Default = getgenv().GlowUse3,
+    Callback = function(v)
+        getgenv().GlowUse3 = v
+    end
+})
+
+silgroup:AddSlider("GlowRotation", {
+    Text = "gradient rotation",
+    Min = 0, Max = 360, Rounding = 0,
+    Default = getgenv().GlowRotation,
+    Callback = function(v)
+        getgenv().GlowRotation = v
+    end
+})
+
+silgroup:AddToggle("GlowSpin", {
+    Text = "spin gradient",
+    Default = false,
+    Callback = function(v)
+        getgenv().GlowSpin = v
+    end
+})
+
+silgroup:AddSlider("GlowSpinSpeed", {
+    Text = "spin speed",
+    Min = 1, Max = 180, Rounding = 0,
+    Default = getgenv().GlowSpinSpeed,
+    Callback = function(v)
+        getgenv().GlowSpinSpeed = v
+    end
 })
 
 silgroup:AddToggle("PerfectSilent", {
@@ -2754,157 +2931,178 @@ silgroup:AddToggle("PerfectSilent", {
     Tooltip = 'requires hookfunction, search your executor on weao. and no, xeno doesnt count😛',
     Callback = function(v)
         getgenv().PerfectSilent = v
-        if v and not getgenv().PerfectSilentHooked then
-            if not hookfunction or not Drawing then
-                Library:Notify("unsupported dumbass", 5)
-            end
-
-            local Players = game:GetService("Players")
-            local RunService = game:GetService("RunService")
-            local UIS = game:GetService("UserInputService")
-            local ReplicatedStorage = game:GetService("ReplicatedStorage")
-            local LocalPlayer = Players.LocalPlayer
-            local Camera = workspace.CurrentCamera
-            local AiZones = workspace:WaitForChild("AiZones")
-            local ok, BulletModule = pcall(require, ReplicatedStorage.Modules.FPS.Bullet)
-            if not ok then
-                    Library:Notify("unsupported dumbass", 5)
-            end
-
-            local SilentAim = {
-                Enabled = true,
-                Prediction = true,
-                HitPart = getgenv().HitPart or "Head",
-                Fov = {
-                    Visible = getgenv().FovVisible ~= false,
-                    Radius = getgenv().FovRadius or 600
-                }
-            }
-
-            local function Alive(plr)
-                local c = plr.Character
-                return c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0
-            end
-
-            local function Visible(origin, target, ...)
-                local ignore = {Camera, ...}
-                if Alive(LocalPlayer) then
-                    ignore[#ignore + 1] = LocalPlayer.Character
-                end
-                local hit = workspace:FindPartOnRayWithIgnoreList(Ray.new(origin, target.Position - origin), ignore)
-                return hit and hit:IsDescendantOf(target.Parent)
-            end
-
-            local function GetAi()
-                local t = {}
-                for _,z in AiZones:GetChildren() do
-                    for _,c in z:GetChildren() do
-                        t[#t + 1] = c
-                    end
-                end
-                return t
-            end
-
-            local function GetTarget(...)
-                local closest, dist = nil, SilentAim.Fov.Radius
-                for _,char in GetAi() do
-                    local part = char:FindFirstChild(SilentAim.HitPart)
-                    if part then
-                        if not SilentAim.WallCheck or Visible(Camera.CFrame.Position, part, ...) then
-                            local pos, onscreen = Camera:WorldToViewportPoint(part.Position)
-                            if onscreen then
-                                local d = (Vector2.new(pos.X,pos.Y) - Camera.ViewportSize/2).Magnitude
-                                if d < dist then
-                                    dist = d
-                                    closest = part
-                                end
-                            end
-                        end
-                    end
-                end
-                for _,plr in Players:GetPlayers() do
-                    if plr ~= LocalPlayer and Alive(plr) then
-                        local part = plr.Character:FindFirstChild(SilentAim.HitPart)
-                        if part then
-                            if not SilentAim.WallCheck or Visible(Camera.CFrame.Position, part, ...) then
-                                local pos, onscreen = Camera:WorldToViewportPoint(part.Position)
-                                if onscreen then
-                                    local d = (Vector2.new(pos.X,pos.Y) - Camera.ViewportSize/2).Magnitude
-                                    if d < dist then
-                                        dist = d
-                                        closest = part
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                return closest
-            end
-
-            local function Solve(A,B,C)
-                local d = B*B - 4*A*C
-                if d < 0 then return end
-                local s = math.sqrt(d)
-                return (-B - s)/(2*A), (-B + s)/(2*A)
-            end
-
-            local function Flight(dir, grav, speed)
-                local r1,r2 = Solve(grav:Dot(grav)/4, grav:Dot(dir)-speed^2, dir:Dot(dir))
-                if r1 and r2 then
-                    local t = math.min(r1,r2)
-                    if t > 0 then return math.sqrt(t) end
-                end
-                return 0
-            end
-
-            local function Predict(part, origin, speed, drop)
-                local g = Vector3.yAxis * (drop * 2)
-                local t = Flight(part.Position - origin, g, speed)
-                return part.Position + part.Velocity * t
-            end
-
-            local function Drop(origin, target, speed, drop)
-                local g = Vector3.yAxis * (drop * 2)
-                local t = Flight(target - origin, g, speed)
-                return 0.5 * g * t^2
-            end
-
-            local OldBullet
-            OldBullet = hookfunction(BulletModule.CreateBullet, function(a,b,c,d,aim,e,ammo,tick,recoil)
-                local target = GetTarget(a,b,c,aim)
-                if target and SilentAim.Enabled and not checkcaller() then
-                    local ammoObj = ReplicatedStorage.AmmoTypes:FindFirstChild(ammo)
-                    if ammoObj then
-                        ammoObj:SetAttribute("Drag", 0)
-                        local speed = ammoObj:GetAttribute("MuzzleVelocity")
-                        local drop = ammoObj:GetAttribute("ProjectileDrop")
-                        local pos = SilentAim.Prediction and Predict(target, aim.Position, speed, drop) or target.Position
-                        local vdrop = Drop(aim.Position, pos, speed, drop)
-                        return OldBullet(a,b,c,d,{CFrame = CFrame.new(aim.Position, pos + vdrop)},e,ammo,tick,recoil)
-                    end
-                end
-                return OldBullet(a,b,c,d,aim,e,ammo,tick,recoil)
-            end)
-
-            local Circle = Drawing.new("Circle")
-            Circle.NumSides = 1000
-            Circle.Thickness = 1
-            Circle.Color = Color3.fromRGB(255,255,255)
-            Circle.Filled = false
-
-            RunService.Heartbeat:Connect(function()
-                Circle.Visible = SilentAim.Enabled and SilentAim.Fov.Visible
-                if Circle.Visible then
-                    Circle.Position = UIS:GetMouseLocation()
-                    Circle.Radius = SilentAim.Fov.Radius
-                end
-            end)
-
-            getgenv().PerfectSilentHooked = true
+        if not v or getgenv().PerfectSilentHooked then return end
+        if not hookfunction or not Drawing then
+            Library:Notify("unsupported dumbass", 5)
+            return
         end
+
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local UIS = game:GetService("UserInputService")
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local LocalPlayer = Players.LocalPlayer
+        local Camera = workspace.CurrentCamera
+        local AiZones = workspace:WaitForChild("AiZones")
+
+        local ok, BulletModule = pcall(require, ReplicatedStorage.Modules.FPS.Bullet)
+        if not ok then
+            Library:Notify("unsupported dumbass", 5)
+            return
+        end
+
+        local function Alive(plr)
+            local c = plr.Character
+            return c and c:FindFirstChild("Humanoid") and c.Humanoid.Health > 0
+        end
+
+        local function Visible(origin, target, ...)
+            local ignore = { Camera, ... }
+            if Alive(LocalPlayer) then
+                ignore[#ignore+1] = LocalPlayer.Character
+            end
+            local hit = workspace:FindPartOnRayWithIgnoreList(
+                Ray.new(origin, target.Position - origin),
+                ignore
+            )
+            return hit and hit:IsDescendantOf(target.Parent)
+        end
+
+        local function GetAi()
+            local t = {}
+            for _,z in AiZones:GetChildren() do
+                for _,c in z:GetChildren() do
+                    t[#t+1] = c
+                end
+            end
+            return t
+        end
+
+        local function GetTarget(...)
+            local closest
+            local dist = getgenv().FovRadius or 600
+            local hitpart = getgenv().HitPart or "Head"
+
+            for _,char in GetAi() do
+                local part = char:FindFirstChild(hitpart)
+                if part then
+                    local pos, on = Camera:WorldToViewportPoint(part.Position)
+                    if on then
+                        local d = (Vector2.new(pos.X,pos.Y) - Camera.ViewportSize/2).Magnitude
+                        if d < dist and Visible(Camera.CFrame.Position, part, ...) then
+                            dist = d
+                            closest = part
+                        end
+                    end
+                end
+            end
+
+            for _,plr in Players:GetPlayers() do
+                if plr ~= LocalPlayer and Alive(plr) then
+                    local part = plr.Character:FindFirstChild(hitpart)
+                    if part then
+                        local pos, on = Camera:WorldToViewportPoint(part.Position)
+                        if on then
+                            local d = (Vector2.new(pos.X,pos.Y) - Camera.ViewportSize/2).Magnitude
+                            if d < dist and Visible(Camera.CFrame.Position, part, ...) then
+                                dist = d
+                                closest = part
+                            end
+                        end
+                    end
+                end
+            end
+
+            return closest
+        end
+
+        local OldBullet
+        OldBullet = hookfunction(BulletModule.CreateBullet, function(a,b,c,d,aim,e,ammo,tick,recoil)
+            local target = GetTarget(a,b,c,aim)
+            if target and not checkcaller() then
+                local ammoObj = ReplicatedStorage.AmmoTypes:FindFirstChild(ammo)
+                if ammoObj then
+                    ammoObj:SetAttribute("Drag", 0)
+                    local speed = ammoObj:GetAttribute("MuzzleVelocity")
+                    local drop = ammoObj:GetAttribute("ProjectileDrop")
+                    return OldBullet(
+                        a,b,c,d,
+                        {CFrame = CFrame.new(aim.Position, target.Position)},
+                        e,ammo,tick,recoil
+                    )
+                end
+            end
+            return OldBullet(a,b,c,d,aim,e,ammo,tick,recoil)
+        end)
+
+        local FovOutline = Drawing.new("Circle")
+        FovOutline.NumSides = 1000
+        FovOutline.Filled = false
+
+        local Fov = Drawing.new("Circle")
+        Fov.NumSides = 1000
+        Fov.Filled = false
+
+        RunService.Heartbeat:Connect(function(dt)
+            local visible = getgenv().FovVisible ~= false
+            local radius = getgenv().FovRadius or 600
+            local thickness = getgenv().FovThickness or 1
+            local outlineT = getgenv().FovOutlineThickness or 1
+            local pos = UIS:GetMouseLocation()
+            local outlineOn = getgenv().FovOutline ~= false
+
+            FovOutline.Visible = visible and outlineOn
+            if FovOutline.Visible then
+                FovOutline.Position = pos
+                FovOutline.Radius = radius
+                FovOutline.Thickness = thickness + outlineT
+                FovOutline.Color = getgenv().FovOutlineColor or Color3.new()
+                FovOutline.Transparency = 1
+            end
+            Fov.Visible = visible
+            if Fov.Visible then
+                Fov.Position = pos
+                Fov.Radius = radius
+                Fov.Thickness = thickness
+                Fov.Color = getgenv().FovColor or Color3.new(1,1,1)
+                Fov.Transparency = 1
+            end
+
+            if not getgenv().FovGlow or not visible then
+                Glow.Visible = false
+            else
+                Glow.Visible = true
+                Glow.Position = UDim2.fromOffset(pos.X, pos.Y)
+                Glow.Size = UDim2.fromOffset(radius*2, radius*2)
+                if getgenv().GlowUse3 then
+                    Gradient.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0,getgenv().GlowC1),
+                        ColorSequenceKeypoint.new(0.5,getgenv().GlowC2),
+                        ColorSequenceKeypoint.new(1,getgenv().GlowC3)
+                    })
+                    Gradient.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0,getgenv().GlowT1),
+                        NumberSequenceKeypoint.new(0.5,getgenv().GlowT2),
+                        NumberSequenceKeypoint.new(1,getgenv().GlowT3)
+                    })
+                else
+                    Gradient.Color = ColorSequence.new(getgenv().GlowC1,getgenv().GlowC3)
+                    Gradient.Transparency = NumberSequence.new(getgenv().GlowT1,getgenv().GlowT3)
+                end
+                if getgenv().GlowSpin then
+                    Gradient.Rotation += getgenv().GlowSpinSpeed * dt
+                else
+                    Gradient.Rotation = getgenv().GlowRotation
+                end
+            end
+        end)
+
+        getgenv().PerfectSilentHooked = true
     end
 })
+
+
+
 
 auto = Tabs.Combat:AddRightGroupbox('autoshoot')
 auto:AddToggle('autoshoot', { Text = 'autoshoot', Default = false })
