@@ -23,8 +23,282 @@ local tabs = {
     wallhacks = window:AddTab('wallhacks'),
     combat = window:AddTab('combat'),
     plr = window:AddTab('local'),
+    world = window:AddTab('world'),
     ['ui settings'] = window:AddTab('ui settings'),
 }
+
+
+local Lighting = game:GetService("Lighting")
+
+local lightingGroup = tabs.world:AddLeftGroupbox("visual")
+
+local ambtoggle = lightingGroup:AddToggle("OverrideAmbient", {
+    Text = "Override Ambient",
+    Default = false
+})
+
+ambtoggle:AddColorPicker("AmbientColor", {
+    Title = "Ambient Color",
+    Default = Lighting.Ambient,
+    Transparency = 0
+})
+
+ambtoggle:AddColorPicker("OutdoorAmbientColor", {
+    Title = "Outdoor Ambient",
+    Default = Lighting.OutdoorAmbient,
+    Transparency = 0
+})
+
+Options.AmbientColor:OnChanged(function()
+    if Toggles.OverrideAmbient.Value then
+        Lighting.Ambient = Options.AmbientColor.Value
+    end
+end)
+
+Options.OutdoorAmbientColor:OnChanged(function()
+    if Toggles.OverrideAmbient.Value then
+        Lighting.OutdoorAmbient = Options.OutdoorAmbientColor.Value
+    end
+end)
+
+Toggles.OverrideAmbient:OnChanged(function(v)
+    if v then
+        Lighting.Ambient = Options.AmbientColor.Value
+        Lighting.OutdoorAmbient = Options.OutdoorAmbientColor.Value
+    else
+        Lighting.Ambient = Color3.fromRGB(128,128,128) -- default fallback
+        Lighting.OutdoorAmbient = Color3.fromRGB(128,128,128)
+    end
+end)
+
+lightingGroup:AddToggle("OverrideBrightness", {
+    Text = "Override Brightness",
+    Default = false
+})
+
+lightingGroup:AddSlider("BrightnessValue", {
+    Text = "Brightness",
+    Min = 0,
+    Max = 10,
+    Rounding = 2,
+    Default = Lighting.Brightness
+})
+
+Options.BrightnessValue:OnChanged(function()
+    if Toggles.OverrideBrightness.Value then
+        Lighting.Brightness = Options.BrightnessValue.Value
+    end
+end)
+
+Toggles.OverrideBrightness:OnChanged(function(v)
+    if v then
+        Lighting.Brightness = Options.BrightnessValue.Value
+    else
+        Lighting.Brightness = 2
+    end
+end)
+
+local colshifttoggle = lightingGroup:AddToggle("OverrideColorShift", {
+    Text = "Override ColorShift",
+    Default = false
+})
+
+colshifttoggle:AddColorPicker("ColorShiftTop", {
+    Title = "ColorShift Top",
+    Default = Lighting.ColorShift_Top,
+    Transparency = 0
+})
+
+colshifttoggle:AddColorPicker("ColorShiftBottom", {
+    Title = "ColorShift Bottom",
+    Default = Lighting.ColorShift_Bottom,
+    Transparency = 0
+})
+
+Options.ColorShiftTop:OnChanged(function()
+    if Toggles.OverrideColorShift.Value then
+        Lighting.ColorShift_Top = Options.ColorShiftTop.Value
+    end
+end)
+
+Options.ColorShiftBottom:OnChanged(function()
+    if Toggles.OverrideColorShift.Value then
+        Lighting.ColorShift_Bottom = Options.ColorShiftBottom.Value
+    end
+end)
+
+Toggles.OverrideColorShift:OnChanged(function(v)
+    if v then
+        Lighting.ColorShift_Top = Options.ColorShiftTop.Value
+        Lighting.ColorShift_Bottom = Options.ColorShiftBottom.Value
+    else
+        Lighting.ColorShift_Top = Color3.new(0,0,0)
+        Lighting.ColorShift_Bottom = Color3.new(0,0,0)
+    end
+end)
+
+lightingGroup:AddToggle("ShadowsEnabled", {
+    Text = "Shadows",
+    Default = Lighting.ShadowSoftness > 0
+})
+
+Toggles.ShadowsEnabled:OnChanged(function(v)
+    Lighting.GlobalShadows = v
+end)
+
+lightingGroup:AddToggle("OverrideClockTime", {
+    Text = "Override ClockTime",
+    Default = false
+})
+
+lightingGroup:AddSlider("ClockTimeValue", {
+    Text = "ClockTime",
+    Min = 0,
+    Max = 24,
+    Rounding = 2,
+    Default = Lighting.ClockTime
+})
+
+Options.ClockTimeValue:OnChanged(function()
+    if Toggles.OverrideClockTime.Value then
+        Lighting.ClockTime = Options.ClockTimeValue.Value
+    end
+end)
+
+Toggles.OverrideClockTime:OnChanged(function(v)
+    if v then
+        Lighting.ClockTime = Options.ClockTimeValue.Value
+    else
+        Lighting.ClockTime = 14
+    end
+end)
+
+local fogcoltoggle = lightingGroup:AddToggle("OverrideFogColor", {
+    Text = "Override Fog Color",
+    Default = false
+})
+
+fogcoltoggle:AddColorPicker("FogColorValue", {
+    Text = "Fog Color",
+    Default = Lighting.FogColor,
+    Transparency = 0
+})
+
+Options.FogColorValue:OnChanged(function()
+    if Toggles.OverrideFogColor.Value then
+        Lighting.FogColor = Options.FogColorValue.Value
+    end
+end)
+
+Toggles.OverrideFogColor:OnChanged(function(v)
+    if v then
+        Lighting.FogColor = Options.FogColorValue.Value
+    else
+        Lighting.FogColor = Color3.fromRGB(192,192,192)
+    end
+end)
+
+lightingGroup:AddToggle("OverrideFogDistance", {
+    Text = "Override Fog Distance",
+    Default = false
+})
+
+lightingGroup:AddSlider("FogStartValue", {
+    Text = "Fog Start",
+    Min = 0,
+    Max = 1000,
+    Rounding = 0,
+    Default = Lighting.FogStart
+})
+
+lightingGroup:AddSlider("FogEndValue", {
+    Text = "Fog End",
+    Min = 0,
+    Max = 10000,
+    Rounding = 0,
+    Default = Lighting.FogEnd
+})
+
+local function updateFog()
+    if Toggles.OverrideFogDistance.Value then
+        Lighting.FogStart = Options.FogStartValue.Value
+        Lighting.FogEnd = Options.FogEndValue.Value
+    end
+end
+
+Options.FogStartValue:OnChanged(updateFog)
+Options.FogEndValue:OnChanged(updateFog)
+
+Toggles.OverrideFogDistance:OnChanged(function(v)
+    if v then
+        updateFog()
+    else
+        Lighting.FogStart = 0
+        Lighting.FogEnd = 100000
+    end
+end)
+
+local function applyLightingSettings()
+    if Toggles.OverrideAmbient.Value then
+        Lighting.Ambient = Options.AmbientColor.Value
+        Lighting.OutdoorAmbient = Options.OutdoorAmbientColor.Value
+    else
+        Lighting.Ambient = Color3.fromRGB(128,128,128)
+        Lighting.OutdoorAmbient = Color3.fromRGB(128,128,128)
+    end
+
+    if Toggles.OverrideBrightness.Value then
+        Lighting.Brightness = Options.BrightnessValue.Value
+    else
+        Lighting.Brightness = 2
+    end
+
+    if Toggles.OverrideColorShift.Value then
+        Lighting.ColorShift_Top = Options.ColorShiftTop.Value
+        Lighting.ColorShift_Bottom = Options.ColorShiftBottom.Value
+    else
+        Lighting.ColorShift_Top = Color3.new(0,0,0)
+        Lighting.ColorShift_Bottom = Color3.new(0,0,0)
+    end
+
+    Lighting.GlobalShadows = Toggles.ShadowsEnabled.Value
+
+    if Toggles.OverrideClockTime.Value then
+        Lighting.ClockTime = Options.ClockTimeValue.Value
+    else
+        Lighting.ClockTime = 14
+    end
+
+    if Toggles.OverrideFogColor.Value then
+        Lighting.FogColor = Options.FogColorValue.Value
+    else
+        Lighting.FogColor = Color3.fromRGB(192,192,192)
+    end
+
+    if Toggles.OverrideFogDistance.Value then
+        Lighting.FogStart = Options.FogStartValue.Value
+        Lighting.FogEnd = Options.FogEndValue.Value
+    else
+        Lighting.FogStart = 0
+        Lighting.FogEnd = 100000
+    end
+end
+
+applyLightingSettings()
+
+for _, toggle in pairs({
+    Toggles.OverrideAmbient,
+    Toggles.OverrideBrightness,
+    Toggles.OverrideColorShift,
+    Toggles.ShadowsEnabled,
+    Toggles.OverrideClockTime,
+    Toggles.OverrideFogColor,
+    Toggles.OverrideFogDistance
+}) do
+    toggle:OnChanged(applyLightingSettings)
+end
+
+
 
 local resolvers = tabs.plr:AddLeftGroupbox('resolvers/manip')
 
@@ -236,8 +510,6 @@ RunService.RenderStepped:Connect(function()
 
     if getgenv().SpeedEnabled then
         humanoid.WalkSpeed = getgenv().SpeedValue
-    else
-        humanoid.WalkSpeed = normalSpeed
     end
 end)
 
@@ -603,7 +875,6 @@ Players.PlayerAdded:Connect(function(plr)
     end)
 end)
 
-
 local Players = game:GetService("Players")
 local lp = Players.LocalPlayer
 
@@ -635,7 +906,6 @@ local function applyBodyCham(char)
         end
     end
 
-    -- shirt + pants (direct children)
     local shirt = char:FindFirstChildOfClass("Shirt")
     if shirt then
         store(shirt, "Parent", shirt.Parent)
@@ -665,16 +935,20 @@ local function restoreBodyCham()
     table.clear(stored)
 end
 
-local function refresh()
-    restoreBodyCham()
+local function applyToAllPlayers()
     for _, plr in ipairs(Players:GetPlayers()) do
         if plr ~= lp and plr.Character then
-            applyBodyCham(plr.Character)
+            task.spawn(function()
+                local hrp = plr.Character:WaitForChild("HumanoidRootPart", 5)
+                if hrp then
+                    applyBodyCham(plr.Character)
+                end
+            end)
         end
     end
 end
 
-local bchamst = chamsGroup:AddToggle("BodyChams", {
+local bchamst = chamGroup:AddToggle("BodyChams", {
     Text = "vischams",
     Default = false
 })
@@ -687,7 +961,7 @@ bchamst:AddColorPicker("BodyChamColor", {
 
 Toggles.BodyChams:OnChanged(function(v)
     if v then
-        refresh()
+        applyToAllPlayers()
     else
         restoreBodyCham()
     end
@@ -697,18 +971,23 @@ Options.BodyChamColor:OnChanged(function()
     chamColor = Options.BodyChamColor.Value
     chamTransparency = Options.BodyChamColor.Transparency
     if Toggles.BodyChams.Value then
-        refresh()
+        applyToAllPlayers()
     end
 end)
 
 Players.PlayerAdded:Connect(function(plr)
     plr.CharacterAdded:Connect(function()
         if Toggles.BodyChams.Value then
-            task.wait(0.5)
-            refresh()
+            task.spawn(function()
+                local hrp = plr.Character:WaitForChild("HumanoidRootPart", 5)
+                if hrp then
+                    applyBodyCham(plr.Character)
+                end
+            end)
         end
     end)
 end)
+
 
 
 
