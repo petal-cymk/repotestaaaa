@@ -8,7 +8,7 @@ local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GK
 
 local logins = {
     { user = "fusion", password = "admin", hwid = "907414537" },
-    { user = "silke",  password = "Imafemboy",  hwid = "3164645513" },
+    { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
 local function getHwid()
