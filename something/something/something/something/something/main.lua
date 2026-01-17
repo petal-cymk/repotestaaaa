@@ -4777,56 +4777,255 @@ MiscDrawing:AddDivider()
 
 
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayersFolder = ReplicatedStorage:WaitForChild("Players")
 
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "InventoryScreenGui"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
+local InventoryContainer = Instance.new("Frame")
+InventoryContainer.Name = "InventoryContainer"
+InventoryContainer.Size = UDim2.new(0, 250, 0, 50)
+InventoryContainer.Position = UDim2.new(1, -260, 0.1, 0)
+InventoryContainer.BackgroundColor3 = Color3.new(0,0,0)
+InventoryContainer.BorderSizePixel = 0
+InventoryContainer.ClipsDescendants = true
+InventoryContainer.Visible = false
+InventoryContainer.Parent = ScreenGui
 
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0,8)
+UICorner.Parent = InventoryContainer
 
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.new(1,1,1)
+UIStroke.Thickness = 2
+UIStroke.Parent = InventoryContainer
 
+local UsernameLabel = Instance.new("TextLabel")
+UsernameLabel.Parent = InventoryContainer
+UsernameLabel.Size = UDim2.new(1, -10, 0, 24)
+UsernameLabel.Position = UDim2.new(0,5,0,5)
+UsernameLabel.BackgroundTransparency = 1
+UsernameLabel.TextColor3 = Color3.new(1,1,1)
+UsernameLabel.TextStrokeTransparency = 1
+UsernameLabel.Font = Enum.Font.Code
+UsernameLabel.TextSize = 18
+UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+UsernameLabel.Text = ""
 
+local Scrolling = Instance.new("ScrollingFrame")
+Scrolling.Name = "InventoryScrolling"
+Scrolling.Size = UDim2.new(1, -10, 1, -34)
+Scrolling.Position = UDim2.new(0,5,0,29)
+Scrolling.BackgroundTransparency = 1
+Scrolling.ScrollBarThickness = 8
+Scrolling.Parent = InventoryContainer
 
+local UIList = Instance.new("UIListLayout")
+UIList.SortOrder = Enum.SortOrder.LayoutOrder
+UIList.Padding = UDim.new(0,2)
+UIList.Parent = Scrolling
 
-local function setInventoryKey(v)
-    if typeof(v) == "EnumItem" then
-        getgenv().inventoryKey = v.Name
-    elseif typeof(v) == "string" and v ~= "None" then
-        getgenv().inventoryKey = v
-    else
-        getgenv().inventoryKey = nil
+local Labels = {}
+
+local function getLabel(text, size, indent, isContainer)
+    local label
+    for _, l in ipairs(Labels) do
+        if not l.Parent then
+            label = l
+            break
+        end
     end
+    if not label then
+        label = Instance.new("TextLabel")
+        label.TextColor3 = UsernameLabel.TextColor3
+        label.BackgroundTransparency = 1
+        label.Font = Enum.Font.Code
+        label.TextStrokeTransparency = 1
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Parent = Scrolling
+        table.insert(Labels,label)
+    end
+    label.Text = text
+    label.TextSize = size
+    label.Position = UDim2.new(0,indent,0,0)
+    label.Size = UDim2.new(1,-indent,0,size+4)
+    label.TextTransparency = 1
+    TweenService:Create(label, TweenInfo.new(0.3), {TextTransparency=0}):Play()
+    label.Parent = Scrolling
+    return label
 end
 
+local function displayInventory(playerFolder)
+    UsernameLabel.Text = playerFolder.Name
+    for _, l in ipairs(Labels) do l.Parent = nil end
+    local inv = playerFolder:FindFirstChild("Inventory")
+    if not inv then return end
+    local totalHeight = 0
+    for _, containerObj in ipairs(inv:GetChildren()) do
+        if containerObj:IsA("ObjectValue") then
+            local containerName = containerObj.Name
+            local subInv = containerObj:FindFirstChild("Inventory")
+            if subInv and #subInv:GetChildren() > 0 then
+                local lbl = getLabel(containerName,18,0,true)
+                totalHeight = totalHeight + lbl.Size.Y.Offset + UIList.Padding.Offset
+                for _, itemObj in ipairs(subInv:GetChildren()) do
+                    if itemObj:IsA("ObjectValue") then
+                        local itemLbl = getLabel(itemObj.Name,14,15,false)
+                        totalHeight = totalHeight + itemLbl.Size.Y.Offset + UIList.Padding.Offset
+                    end
+                end
+            else
+                local lbl = getLabel(containerName.." = {}",18,0,true)
+                totalHeight = totalHeight + lbl.Size.Y.Offset + UIList.Padding.Offset
+            end
+        end
+    end
+    TweenService:Create(InventoryContainer,TweenInfo.new(0.3),{Size=UDim2.new(0,250,0,totalHeight+34)}):Play()
+    Scrolling.CanvasSize = UDim2.new(0,0,totalHeight,0)
+end
 
-MiscDrawing:AddToggle('InventoryEnabled', {
-    Text = 'inventory checker',
+local Camera = workspace.CurrentCamera
+local function getClosestPlayerToCenter()
+    local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+    local closest
+    local minDist = math.huge
+    for _, plrFolder in ipairs(PlayersFolder:GetChildren()) do
+        local playerName = plrFolder.Name
+        local player = Players:FindFirstChild(playerName)
+        if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local root = player.Character.HumanoidRootPart
+            local screenPos, onScreen = Camera:WorldToViewportPoint(root.Position)
+            if onScreen then
+                local dist = (Vector2.new(screenPos.X, screenPos.Y) - center).Magnitude
+                if dist < minDist then
+                    minDist = dist
+                    closest = plrFolder
+                end
+            end
+        end
+    end
+    return closest
+end
+
+local currentPlayer
+local firstPlayer = PlayersFolder:FindFirstChildOfClass("Folder")
+if firstPlayer then currentPlayer = firstPlayer displayInventory(currentPlayer) end
+
+RunService.RenderStepped:Connect(function()
+    if InventoryContainer.Visible then
+        local closest = getClosestPlayerToCenter()
+        if closest and closest ~= currentPlayer then
+            currentPlayer = closest
+            displayInventory(currentPlayer)
+        end
+    end
+end)
+
+
+local settings = {
+    enabled = false,
+    holdKey = Enum.KeyCode.LeftAlt,
+    cornerRadius = 8,
+    textColor = Color3.new(1,1,1),
+    outlineColor = Color3.new(1,1,1)
+}
+
+local inventoryToggle = MiscDrawing:AddToggle('inventoryToggle', {
+    Text = 'show inventory',
     Default = false,
-    Callback = function(Value)
-        getgenv().inventoryChecker = Value
+    Tooltip = 'toggle inventory ui',
+    Callback = function(val)
+        settings.enabled = val
+        InventoryContainer.Visible = val
     end
 })
 
-Toggles.InventoryEnabled:OnChanged(function()
-    getgenv().inventoryChecker = Toggles.InventoryEnabled.Value
-end)
-
-MiscDrawing:AddLabel('inventory checker keybind'):AddKeyPicker('InventoryKeybind', {
-    Default = 'None',
-    SyncToggleState = false,
-    Mode = 'Hold',
-    Text = 'inventory checker',
-    NoUI = false,
-
-    Callback = function(Value)
-        setInventoryKey(Value)
-    end,
-
-    ChangedCallback = function(New)
-        setInventoryKey(New)
+MiscDrawing:AddSlider('cornerRadius', {
+    Text = 'ui corner radius',
+    Default = 8,
+    Min = 0,
+    Max = 25,
+    Rounding = 0,
+    Callback = function(val)
+        settings.cornerRadius = val
+        if InventoryContainer:FindFirstChild('UICorner') then
+            InventoryContainer.UICorner.CornerRadius = UDim.new(0,val)
+        end
     end
 })
 
-Options.InventoryKeybind:OnChanged(function()
-    setInventoryKey(Options.InventoryKeybind.Value)
+MiscDrawing:AddLabel('ui colors')
+
+local textColorPicker = MiscDrawing:AddLabel('text color'):AddColorPicker('textColor', {
+    Default = Color3.new(1,1,1),
+    Transparency = 0,
+    Callback = function(val)
+        settings.textColor = val
+        for _, lbl in ipairs(Labels) do
+            lbl.TextColor3 = val
+        end
+        UsernameLabel.TextColor3 = val
+    end
+})
+
+local outlineColorPicker = MiscDrawing:AddLabel('outline color'):AddColorPicker('outlineColor', {
+    Default = Color3.new(1,1,1),
+    Transparency = 0,
+    Callback = function(val)
+        settings.outlineColor = val
+        if InventoryContainer:FindFirstChild('UIStroke') then
+            InventoryContainer.UIStroke.Color = val
+        end
+    end
+})
+
+local dragging = false
+local dragInput, dragStart, startPos
+
+InventoryContainer.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = InventoryContainer.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
+
+InventoryContainer.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        local delta = input.Position - dragStart
+        InventoryContainer.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+
+
+
+
+
 
 getgenv().BeamEnabled = false
 getgenv().BeamFadeDuration = 2
@@ -7043,7 +7242,6 @@ local modules = {
     mineEsp = "https://pastebin.com/raw/GJem6ti2",
     silentaim = "https://codeberg.org/fuse/sma/raw/branch/main/sl",
     corpseesp = "https://pastebin.com/raw/g0T31sYd",
-    invchecker = "https://pastebin.com/raw/VBc0Gx4G",
 }
 
 local lp = game:GetService("Players").LocalPlayer
