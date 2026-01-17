@@ -7,7 +7,7 @@
    / __ \/ _ \/ __/ __ `/ /                               
   / /_/ /  __/ /_/ /_/ / /                                
  / .___/\___/\__/\__,_/_/                                 
-/_/                                 ]]                      
+/_/                                 ]] 
 local repo = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
 -- ============= --
 -- [[ MODULES ]] --
@@ -36,6 +36,8 @@ local tabs = {
     world = window:AddTab('world'),
     ['ui settings'] = window:AddTab('ui settings'),
 }
+
+
 
 
 local Lighting = game:GetService("Lighting")
@@ -307,6 +309,28 @@ for _, toggle in pairs({
 }) do
     toggle:OnChanged(applyLightingSettings)
 end
+
+local fx = tabs.plr:AddRightGroupbox('fx')
+
+local RunService = game:GetService("RunService")
+local cam = workspace.CurrentCamera
+
+local fovSlider = fx:AddSlider("FOVValue", {
+    Text = "fov editor",
+    Min = 70,
+    Max = 120,
+    Rounding = 0,
+    Default = 90
+})
+
+getgenv().FOVOverride = true
+
+RunService.RenderStepped:Connect(function()
+    if getgenv().FOVOverride then
+        cam.FieldOfView = Options.FOVValue.Value
+    end
+end)
+
 
 
 
