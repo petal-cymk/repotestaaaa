@@ -6,10 +6,18 @@ local HttpService = game:GetService("HttpService")
 
 local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GKzEdvU23qn5GM0wilHwxh8i45ngp_BdHzosvFvL5WHDF2xvEcfT659vp5gQ"
 
-local logins = {
-    { user = "fusion", password = "admin", hwid = "1098584457" },
-    { user = "silke",  password = "Imafemboy",  hwid = "953702645" },
-}
+local HttpService = game:GetService("HttpService")
+
+local LOGINS_URL = "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/logins.json"
+
+local function fetchLogins()
+    local res = request({
+        Url = LOGINS_URL,
+        Method = "GET"
+    })
+    return HttpService:JSONDecode(res.Body)
+end
+
 
 -- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
 local function getHwid()
