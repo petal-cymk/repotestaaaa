@@ -8,7 +8,7 @@ local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GK
 
 local logins = {
     { user = "fusion", password = "admin", hwid = "1098584457" },
-    { user = "silke",  password = "Imafemboy",  hwid = "" },
+    { user = "silke",  password = "Imafemboy",  hwid = "953702645" },
 }
 
 -- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
