@@ -11,23 +11,27 @@ local logins = {
     { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
+-- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
 local function getHwid()
-    local res = request({
-        Url = "https://httpbin.org/get",
-        Method = "GET"
-    })
-    if not res then return "hwid_fail" end
+    local clientid = "unknown"
+    local executor = "unknown"
 
-    local headers = res.Headers or {}
-    local raw = ""
-
-    for k,v in pairs(headers) do
-        raw ..= tostring(k) .. ":" .. tostring(v) .. ";"
+    if gethwid then
+        clientid = tostring(gethwid())
+    elseif game.GetService then
+        local ok, id = pcall(function()
+            return game:GetService("RbxAnalyticsService"):GetClientId()
+        end)
+        if ok and id then
+            clientid = tostring(id)
+        end
     end
 
-    if raw == "" then
-        return "hwid_fail"
+    if identifyexecutor then
+        executor = tostring(identifyexecutor())
     end
+
+    local raw = clientid .. "|" .. executor
 
     local hash = 0
     for i = 1, #raw do
@@ -36,6 +40,7 @@ local function getHwid()
 
     return tostring(hash)
 end
+
 
 
 task.spawn(function()
