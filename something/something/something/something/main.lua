@@ -699,7 +699,7 @@ local silgroup = tabs.combat:AddLeftGroupbox('Aimbot')
 getgenv().AimbotEnabled = getgenv().AimbotEnabled or false
 getgenv().AimbotTeamCheck = getgenv().AimbotTeamCheck or true
 getgenv().AimbotWallCheck = getgenv().AimbotWallCheck or true
-getgenv().AimbotSmoothness = getgenv().AimbotSmoothness or 0.12
+getgenv().AimbotSmoothness = getgenv().AimbotSmoothness or 1
 getgenv().AimbotHitPart = getgenv().AimbotHitPart or "Head"
 getgenv().AimbotKey = nil
 
@@ -719,7 +719,7 @@ Toggles.AimbotWallCheck:OnChanged(function(v)
 end)
 
 silgroup:AddSlider('AimbotSmoothness', {
-    Text = 'smoothness',
+    Text = 'rage',
     Min = 0,
     Max = 1,
     Rounding = 2,
