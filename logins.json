@@ -124,6 +124,12 @@
       "user": "O65",
       "password": "07S29qmjcp",
       "hwid": ""
+    },
+    {
+      "user": "fusion2",
+      "password": "admin2",
+      "hwid": "",
+      "discord_user": "1224462212756799560"
     }
   ]
 }
