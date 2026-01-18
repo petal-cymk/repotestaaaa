@@ -312,6 +312,9 @@ end
 
 local fx = tabs.plr:AddRightGroupbox('fx')
 
+
+
+
 local RunService = game:GetService("RunService")
 local cam = workspace.CurrentCamera
 
@@ -335,6 +338,185 @@ end)
 
 
 local resolvers = tabs.plr:AddLeftGroupbox('resolvers/manip')
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+
+getgenv().PhaseKey = nil
+local distance = 1
+local keys = {W=false, S=false, A=false, D=false, E=false, Q=false}
+
+UIS.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if keys[input.KeyCode.Name] ~= nil then keys[input.KeyCode.Name] = true end
+end)
+
+UIS.InputEnded:Connect(function(input)
+    if keys[input.KeyCode.Name] ~= nil then keys[input.KeyCode.Name] = false end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not getgenv().PhaseKey then return end
+    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then return end
+
+    local hrp = lp.Character.HumanoidRootPart
+    if UIS:IsKeyDown(getgenv().PhaseKey) then
+        local cam = workspace.CurrentCamera
+        local forward = cam.CFrame.LookVector
+        local right = cam.CFrame.RightVector
+        local up = Vector3.new(0,0,0)
+
+        if keys.E then up = Vector3.new(0,1,0) end
+        if keys.Q then up = Vector3.new(0,-1,0) end
+
+        local move = forward + right * ((keys.D and 1 or 0) + (keys.A and -1 or 0)) + up
+        move = move.Unit * distance
+
+        if not keys.E and not keys.Q then
+            move = Vector3.new(move.X, 0, move.Z)
+        end
+
+        hrp.CFrame = hrp.CFrame + move
+    end
+end)
+
+local phaseToggle = resolvers:AddLabel('noclip'):AddKeyPicker("PhaseKeyBind", {
+    Text = "noclip",
+    Default = "None",
+    Mode = "Toggle"
+})
+
+Options.PhaseKeyBind:OnChanged(function()
+    if Options.PhaseKeyBind.Value == "None" then
+        getgenv().PhaseKey = nil
+    else
+        getgenv().PhaseKey = Enum.KeyCode[Options.PhaseKeyBind.Value]
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+local lastJump = 0
+
+local noFallKey = nil
+local noFallEnabled = false
+local raiseAmount = 2
+local floatCheckDistance = 3
+local jumpCooldown = 3
+
+UIS.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.Space then
+        lastJump = tick()
+    end
+end)
+
+local noFallToggle = resolvers:AddToggle("NoFallEnabled", {
+    Text = "infbounce",
+    Default = false
+})
+
+local noFallBind = noFallToggle:AddKeyPicker("NoFallKeyBind", {
+    Text = "fallbounce",
+    Default = "None",
+    Mode = "Toggle"
+})
+
+Options.NoFallKeyBind:OnChanged(function()
+    if Options.NoFallKeyBind.Value == "None" then
+        noFallKey = nil
+    else
+        noFallKey = Enum.KeyCode[Options.NoFallKeyBind.Value]
+    end
+end)
+
+Toggles.NoFallEnabled:OnChanged(function(v)
+    noFallEnabled = v
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not noFallEnabled or not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then return end
+    if noFallKey and not UIS:IsKeyDown(noFallKey) then return end
+
+    local hrp = lp.Character.HumanoidRootPart
+    local origin = hrp.Position
+    local ray = Ray.new(origin, Vector3.new(0, -floatCheckDistance, 0))
+    local hit = workspace:FindPartOnRayWithIgnoreList(ray, {lp.Character})
+
+    if not hit and tick() - lastJump > jumpCooldown then
+        hrp.CFrame = hrp.CFrame + Vector3.new(0, raiseAmount, 0)
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+local lp = Players.LocalPlayer
+local mouse = lp:GetMouse()
+
+local peekSpeed = 200
+
+local leftKey, rightKey, upKey
+
+local function doPeek(directionVec)
+    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then return end
+    local hrp = lp.Character.HumanoidRootPart
+    local originalCFrame = hrp.CFrame
+
+    hrp.Velocity = directionVec * peekSpeed
+    mouse1press()
+    task.wait(0.25)
+    mouse1release()
+    mouse1press()
+    task.wait(0.25)
+    mouse1release()
+
+    hrp.CFrame = originalCFrame
+end
+
+local llabel = resolvers:AddLabel('left instapeek')
+local rlabel = resolvers:AddLabel('right instapeeek')
+local ulabel = resolvers:AddLabel('up instapeek')
+local leftBind = llabel:AddKeyPicker("InstapeekLeft", {Text="instapeek >", Default="None", Mode="Hold"})
+local rightBind = rlabel:AddKeyPicker("InstapeekRight", {Text="instapeek <", Default="None", Mode="Hold"})
+local upBind = ulabel:AddKeyPicker("InstapeekUp", {Text="instapeek ^", Default="None", Mode="Hold"})
+
+Options.InstapeekLeft:OnChanged(function()
+    if Options.InstapeekLeft.Value == "None" then leftKey = nil else leftKey = Enum.KeyCode[Options.InstapeekLeft.Value] end
+end)
+Options.InstapeekRight:OnChanged(function()
+    if Options.InstapeekRight.Value == "None" then rightKey = nil else rightKey = Enum.KeyCode[Options.InstapeekRight.Value] end
+end)
+Options.InstapeekUp:OnChanged(function()
+    if Options.InstapeekUp.Value == "None" then upKey = nil else upKey = Enum.KeyCode[Options.InstapeekUp.Value] end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if not lp.Character or not lp.Character:FindFirstChild("HumanoidRootPart") then return end
+    local hrp = lp.Character.HumanoidRootPart
+    local camCF = workspace.CurrentCamera.CFrame
+
+    if leftKey and UIS:IsKeyDown(leftKey) then
+        doPeek(-camCF.RightVector)
+    end
+
+    if rightKey and UIS:IsKeyDown(rightKey) then
+        doPeek(camCF.RightVector)
+    end
+
+    if upKey and UIS:IsKeyDown(upKey) then
+        doPeek(Vector3.new(0,1,0))
+    end
+end)
+
+
+
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -699,7 +881,7 @@ local silgroup = tabs.combat:AddLeftGroupbox('Aimbot')
 getgenv().AimbotEnabled = getgenv().AimbotEnabled or false
 getgenv().AimbotTeamCheck = getgenv().AimbotTeamCheck or true
 getgenv().AimbotWallCheck = getgenv().AimbotWallCheck or true
-getgenv().AimbotSmoothness = getgenv().AimbotSmoothness or 1
+getgenv().AimbotSmoothness = getgenv().AimbotSmoothness or 0.12
 getgenv().AimbotHitPart = getgenv().AimbotHitPart or "Head"
 getgenv().AimbotKey = nil
 
@@ -719,7 +901,7 @@ Toggles.AimbotWallCheck:OnChanged(function(v)
 end)
 
 silgroup:AddSlider('AimbotSmoothness', {
-    Text = 'rage',
+    Text = 'smoothness',
     Min = 0,
     Max = 1,
     Rounding = 2,
@@ -983,7 +1165,7 @@ local function applyToAllPlayers()
 end
 
 local bchamst = chamGroup:AddToggle("BodyChams", {
-    Text = "vischams",
+    Text = "visible chams",
     Default = false
 })
 
@@ -1021,6 +1203,206 @@ Players.PlayerAdded:Connect(function(plr)
         end
     end)
 end)
+
+local RunService = game:GetService("RunService")
+local cam = workspace.CurrentCamera
+
+local storedVM = {}
+local vmTransparency = 0
+local vmMaterial = Enum.Material.Neon
+local vmColor = Color3.fromRGB(255, 0, 0)
+
+local highlightMode = false
+local highlightOutline = 0
+local highlightFill = 0
+local highlightColor = Color3.fromRGB(255,0,0)
+local highlightOutlineColor = Color3.fromRGB(0,0,0)
+local highlights = {}
+
+local function storeVM(inst, prop, val)
+    storedVM[inst] = storedVM[inst] or {}
+    if storedVM[inst][prop] == nil then
+        storedVM[inst][prop] = val
+    end
+end
+
+local function applyViewmodelChams()
+    local arms = cam:FindFirstChild("Arms")
+    if not arms then return end
+
+    for _, d in ipairs(arms:GetDescendants()) do
+        if d:IsA("BasePart") then
+            local nameLower = d.Name:lower()
+            local isArm = string.find(nameLower, "arm")
+            
+            storeVM(d, "Material", d.Material)
+            storeVM(d, "Transparency", d.Transparency)
+            storeVM(d, "Color", d.Color)
+            
+            if highlightMode then
+                if not highlights[d] then
+                    local h = Instance.new("Highlight")
+                    h.Adornee = d
+                    h.FillTransparency = math.clamp(1-highlightFill/20, 0,1)
+                    h.OutlineTransparency = math.clamp(1-highlightOutline/20, 0,1)
+                    h.FillColor = highlightColor
+                    h.OutlineColor = highlightOutlineColor
+                    h.Parent = cam
+                    highlights[d] = h
+                else
+                    local h = highlights[d]
+                    h.FillTransparency = math.clamp(1-highlightFill/20, 0,1)
+                    h.OutlineTransparency = math.clamp(1-highlightOutline/20, 0,1)
+                    h.FillColor = highlightColor
+                    h.OutlineColor = highlightOutlineColor
+                end
+            else
+                if highlights[d] then
+                    highlights[d]:Destroy()
+                    highlights[d] = nil
+                end
+                
+                if not isArm then
+                    if d.Transparency < 0.95 then
+                        d.Material = vmMaterial
+                        d.Transparency = vmTransparency
+                        d.Color = vmColor
+                    end
+                else
+                    -- arm parts keep original transparency
+                    d.Material = vmMaterial
+                    d.Color = vmColor
+                end
+            end
+
+        elseif d:IsA("SpecialMesh") or d:IsA("SurfaceAppearance") then
+            storeVM(d, "Parent", d.Parent)
+            d.Parent = nil
+        end
+    end
+end
+
+local function restoreViewmodel()
+    for inst, props in pairs(storedVM) do
+        pcall(function()
+            if props.Parent then
+                inst.Parent = props.Parent
+            end
+            for prop, val in pairs(props) do
+                if prop ~= "Parent" then
+                    inst[prop] = val
+                end
+            end
+        end)
+    end
+    table.clear(storedVM)
+    
+    for _, h in pairs(highlights) do
+        h:Destroy()
+    end
+    highlights = {}
+end
+
+local vmToggle = chamGroup:AddToggle("ViewmodelChams", {
+    Text = "viewmodel chams",
+    Default = false
+})
+
+vmToggle:AddColorPicker("VMColor", {
+    Title = "color",
+    Default = Color3.fromRGB(255, 0, 0),
+    Transparency = 0
+})
+
+chamGroup:AddDropdown("VMMaterial", {
+    Text = "viewmodel material",
+    Values = {"Neon", "SmoothPlastic", "ForceField"},
+    Default = "Neon"
+})
+
+chamGroup:AddSlider("VMTransparency", {
+    Text = "viewmodel transparency",
+    Min = 0,
+    Max = 1,
+    Rounding = 2,
+    Default = 0
+})
+
+local highlightToggle = chamGroup:AddToggle("VMHighlight", {
+    Text = "add highlight",
+    Default = false
+})
+
+highlightToggle:AddColorPicker("HighlightColor", {
+    Title = "fill color",
+    Default = Color3.fromRGB(255,0,0),
+    Transparency = 0
+})
+
+highlightToggle:AddColorPicker("HighlightOutlineColor", {
+    Title = "outline color",
+    Default = Color3.fromRGB(0,0,0),
+    Transparency = 0
+})
+
+chamGroup:AddSlider("HighlightFill", {
+    Text = "fill transparency",
+    Min = -20,
+    Max = 20,
+    Rounding = 2,
+    Default = 0
+})
+
+chamGroup:AddSlider("HighlightOutline", {
+    Text = "outline transparency",
+    Min = -20,
+    Max = 20,
+    Rounding = 2,
+    Default = 0
+})
+
+local function refreshVM()
+    local matMap = {
+        Neon = Enum.Material.Neon,
+        SmoothPlastic = Enum.Material.SmoothPlastic,
+        ForceField = Enum.Material.ForceField
+    }
+    vmMaterial = Options.VMMaterial.Value and matMap[Options.VMMaterial.Value] or Enum.Material.Neon
+    vmTransparency = Options.VMTransparency.Value
+    vmColor = Options.VMColor.Value
+
+    highlightMode = Toggles.VMHighlight.Value
+    highlightColor = Options.HighlightColor.Value
+    highlightOutlineColor = Options.HighlightOutlineColor.Value
+    highlightFill = Options.HighlightFill.Value
+    highlightOutline = Options.HighlightOutline.Value
+
+    applyViewmodelChams()
+end
+
+Toggles.ViewmodelChams:OnChanged(function(v)
+    if v then
+        refreshVM()
+    else
+        restoreViewmodel()
+    end
+end)
+
+Options.VMTransparency:OnChanged(refreshVM)
+Options.VMMaterial:OnChanged(refreshVM)
+Options.VMColor:OnChanged(refreshVM)
+Options.HighlightColor:OnChanged(refreshVM)
+Options.HighlightOutlineColor:OnChanged(refreshVM)
+Options.HighlightFill:OnChanged(refreshVM)
+Options.HighlightOutline:OnChanged(refreshVM)
+Toggles.VMHighlight:OnChanged(refreshVM)
+
+RunService.RenderStepped:Connect(function()
+    if Toggles.ViewmodelChams.Value then
+        refreshVM()
+    end
+end)
+
 
 
 
@@ -1145,6 +1527,7 @@ glowcol:AddColorPicker('boxglow_color2', {
     Callback = function(val) getgenv().BoxGlowColor2 = val end
 })
 
+Library.KeybindFrame.Visible = true;
 thememanager:SetLibrary(library)
 savemanager:SetLibrary(library)
 savemanager:IgnoreThemeSettings()
