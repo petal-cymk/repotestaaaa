@@ -3,26 +3,26 @@ getgenv().loginError = nil
 local user = getgenv().user
 local password = getgenv().password
 local HttpService = game:GetService("HttpService")
-
 local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GKzEdvU23qn5GM0wilHwxh8i45ngp_BdHzosvFvL5WHDF2xvEcfT659vp5gQ"
-
-local HttpService = game:GetService("HttpService")
-
 local LOGINS_URL = "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/logins.json"
 
+-- fetch logins safely
 local function fetchLogins()
-    local raw = game:HttpGet(LOGINS_URL)
-    local decoded = HttpService:JSONDecode(raw)
-    return decoded.logins
+    local success, logins = pcall(function()
+        local raw = game:HttpGet(LOGINS_URL)
+        local decoded = HttpService:JSONDecode(raw)
+        return decoded.logins
+    end)
+    if success and type(logins) == "table" then
+        return logins
+    else
+        return {}
+    end
 end
 
-local logins = fetchLogins() or {}
-local success, logins = pcall(fetchLogins)
-if not success or type(logins) ~= "table" then
-    logins = {}
-end
+local logins = fetchLogins()
 
--- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
+-- get hwid (hookable)
 local function getHwid()
     local clientid = "unknown"
     local executor = "unknown"
@@ -43,16 +43,12 @@ local function getHwid()
     end
 
     local raw = clientid .. "|" .. executor
-
     local hash = 0
     for i = 1, #raw do
         hash = (hash * 31 + raw:byte(i)) % 4294967296
     end
-
     return tostring(hash)
 end
-
-
 
 task.spawn(function()
     while true do
@@ -61,16 +57,18 @@ task.spawn(function()
             getgenv().loginRequested = false
             user = getgenv().user
             password = getgenv().password
-            if not user or not password or user=="" or password=="" then
+
+            if not user or not password or user == "" or password == "" then
                 getgenv().loginError = "enter username/password"
             else
                 local found
-                for _,v in ipairs(logins) do
-                    if v.user==user and v.password==password then
+                for _, v in ipairs(logins) do
+                    if v.user == user and v.password == password then
                         found = v
                         break
                     end
                 end
+
                 if not found then
                     getgenv().loginError = "invalid login"
                 else
@@ -82,7 +80,7 @@ task.spawn(function()
                                 Method = "POST",
                                 Headers = {["Content-Type"]="application/json"},
                                 Body = HttpService:JSONEncode({
-                                    content = "new hwid bind\nuser: "..found.user.."\nhwid: ```"..hwid.."```"
+                                    content = "new hwid bind\nuser: " .. found.user .. "\nhwid: ```" .. hwid .. "```"
                                 })
                             })
                         else
