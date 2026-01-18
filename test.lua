@@ -7,24 +7,34 @@ local HttpService = game:GetService("HttpService")
 local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GKzEdvU23qn5GM0wilHwxh8i45ngp_BdHzosvFvL5WHDF2xvEcfT659vp5gQ"
 
 local logins = {
-    { user = "fusion", password = "admin", hwid = "907414537" },
-    { user = "silke",  password = "Imafemboy",  hwid = "0" },
+    { user = "fusion", password = "admin", hwid = "" },
+    { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
 local function getHwid()
-    local res = request({ Url = "https://httpbin.org/headers", Method = "GET" })
-    if not res or not res.Body then return "hwid_fail" end
-    local body = res.Body
+    local res = request({
+        Url = "https://httpbin.org/get",
+        Method = "GET"
+    })
+    if not res then return "hwid_fail" end
 
-    local function extract(key)
-        local pattern = '"'..key..'":%s*"([^"]+)"'
-        return body:match(pattern) or ""
+    local headers = res.Headers or {}
+    local raw = ""
+
+    for k,v in pairs(headers) do
+        raw ..= tostring(k) .. ":" .. tostring(v) .. ";"
     end
 
-    local raw = extract("User-Agent") .. extract("Accept-Language") .. extract("Accept-Encoding")
-        local hash = 0
-        for i=1,#raw do hash = (hash*31 + raw:byte(i))%4294967296 end
-        return tostring(hash)
+    if raw == "" then
+        return "hwid_fail"
+    end
+
+    local hash = 0
+    for i = 1, #raw do
+        hash = (hash * 31 + raw:byte(i)) % 4294967296
+    end
+
+    return tostring(hash)
 end
 
 
