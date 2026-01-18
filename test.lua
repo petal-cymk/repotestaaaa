@@ -7,7 +7,7 @@ local HttpService = game:GetService("HttpService")
 local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GKzEdvU23qn5GM0wilHwxh8i45ngp_BdHzosvFvL5WHDF2xvEcfT659vp5gQ"
 
 local logins = {
-    { user = "fusion", password = "admin", hwid = "" },
+    { user = "fusion", password = "admin", hwid = "1098584457" },
     { user = "silke",  password = "Imafemboy",  hwid = "" },
 }
 
