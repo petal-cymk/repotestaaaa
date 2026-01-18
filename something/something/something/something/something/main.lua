@@ -3802,7 +3802,7 @@ Env = Tabs.Misc:AddRightGroupbox('World')
 local Lighting = game:GetService("Lighting")
 local Atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
 
-Env:AddToggle('EnvMaster', { Text = 'environment editor', Default = false })
+Env:AddToggle('EnvMaster', { Text = 'environmnet editor', Default = false })
 
 Env:AddDivider()
 
@@ -5606,6 +5606,54 @@ URBox:AddSlider("UR_Throttle", {
 }):OnChanged(function()
     getgenv().UR_Throttle = Options.UR_Throttle.Value
 end)
+
+URBox:AddDivider()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local lp = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+
+local tpkillKeypicker = URBox:AddLabel("tp kill"):AddKeyPicker("TPKillKey", {
+    Text = "tp kill",
+    Default = "None",
+    Mode = "Hold",
+    SyncToggleState = true
+})
+
+local function getClosestPlayer()
+    local mouse = lp:GetMouse()
+    local closest, shortest = nil, math.huge
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= lp and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local pos, onScreen = cam:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X,pos.Y) - Vector2.new(mouse.X,mouse.Y)).Magnitude
+                if dist < shortest then
+                    shortest = dist
+                    closest = plr
+                end
+            end
+        end
+    end
+    return closest
+end
+
+RunService.RenderStepped:Connect(function()
+    if Options.TPKillKey:GetState() then
+        local target = getClosestPlayer()
+        if target and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+            local hrp = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local tgtPos = target.Character.HumanoidRootPart.Position
+                hrp.CFrame = CFrame.new(tgtPos + Vector3.new(0,35,0), tgtPos) -- 35 studs above looking at them
+                cam.CFrame = CFrame.new(cam.CFrame.Position, tgtPos)
+            end
+        end
+    end
+end)
+
+
 
 
 
