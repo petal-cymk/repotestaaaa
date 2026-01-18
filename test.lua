@@ -25,7 +25,6 @@ local function getHwid()
         local hash = 0
         for i=1,#raw do hash = (hash*31 + raw:byte(i))%4294967296 end
         return tostring(hash)
-    end
 end
 
 
