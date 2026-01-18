@@ -15,8 +15,10 @@ local function fetchLogins()
     local decoded = HttpService:JSONDecode(raw)
     return decoded.logins
 end
-local logins = fetchLogins()
-if type(logins) ~= "table" then
+
+local logins = fetchLogins() or {}
+local success, logins = pcall(fetchLogins)
+if not success or type(logins) ~= "table" then
     logins = {}
 end
 
