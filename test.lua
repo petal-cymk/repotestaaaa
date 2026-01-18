@@ -15,7 +15,7 @@ local function fetchLogins()
     local decoded = HttpService:JSONDecode(raw)
     return decoded.logins
 end
-
+local logins = fetchLogins() or {}
 
 
 -- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
