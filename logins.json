@@ -1,10 +1,14 @@
 {
-  "fusion": {
-    "password": "admin",
-    "hwid": "1098584457"
-  },
-  "silke": {
-    "password": "Imafemboy",
-    "hwid": "953702645"
-  }
+  "logins": [
+    {
+      "user": "fusion",
+      "password": "admin",
+      "hwid": "1098584457"
+    },
+    {
+      "user": "silke",
+      "password": "Imafemboy",
+      "hwid": "953702645"
+    }
+  ]
 }
