@@ -8,8 +8,6 @@ local WEBHOOK = "https://discord.com/api/webhooks/1461397355738828903/D5SuLOc5GK
 
 local HttpService = game:GetService("HttpService")
 
-local HttpService = game:GetService("HttpService")
-
 local LOGINS_URL = "https://raw.githubusercontent.com/petal-cymk/repotestaaaa/refs/heads/main/logins.json"
 
 local function fetchLogins()
