@@ -15,8 +15,10 @@ local function fetchLogins()
     local decoded = HttpService:JSONDecode(raw)
     return decoded.logins
 end
-local logins = fetchLogins() or {}
-
+local logins = fetchLogins()
+if type(logins) ~= "table" then
+    logins = {}
+end
 
 -- i cant be asked to get a real hwid, so yes, you get easily hookable one, yay
 local function getHwid()
